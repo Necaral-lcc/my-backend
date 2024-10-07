@@ -1,0 +1,76 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  name         String?
+  deletedFlag  Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now()) @updatedAt
+  posts        Post[]
+  role         Role?    @relation(fields: [roleId], references: [id])
+  roleId       Int?
+  dept         Dept?    @relation(fields: [deptId], references: [id])
+  deptId       Int?
+  Menu         Menu[]   @relation("UserMenu")
+  createdMenus Menu[]   @relation("UserCreatedMenu")
+  updatedMenus Menu[]   @relation("UserUpdatedMenu")
+}
+
+model Post {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  title     String
+  content   String?
+  published Boolean  @default(false)
+  viewCount Int      @default(0)
+  authorId  Int?
+  author    User?    @relation(fields: [authorId], references: [id])
+
+  @@index([authorId], map: "Post_authorId_fkey")
+}
+
+model Menu {
+  id          Int      @id @default(autoincrement())
+  name        String
+  icon        String?
+  path        String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedFlag Boolean  @default(false)
+  parent      Menu?    @relation("MenuToMenu", fields: [parentId], references: [id])
+  children    Menu[]   @relation("MenuToMenu")
+  parentId    Int?
+  createdById Int?
+  createdBy   User?    @relation("UserCreatedMenu", fields: [createdById], references: [id])
+  updatedById Int?
+  updatedBy   User?    @relation("UserUpdatedMenu", fields: [updatedById], references: [id])
+  User        User?    @relation("UserMenu", fields: [userId], references: [id])
+  userId      Int?
+}
+
+model Role {
+  id          Int      @id @default(autoincrement())
+  name        String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedFlag Boolean  @default(false)
+  users       User[]
+}
+
+model Dept {
+  id          Int      @id @default(autoincrement())
+  name        String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedFlag Boolean  @default(false)
+  users       User[]
+}

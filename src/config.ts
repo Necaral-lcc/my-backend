@@ -4,6 +4,8 @@ dotenv.config({
   path: ['.env', '.env.development', '.env.production'],
 })
 
-const PORT = process.env[`${process.env.node_env}_PORT`] || 3001
+const nodeEnv = process.env.node_env || 'development'
+
+const PORT = process.env[`${nodeEnv}_PORT`] || process.env.PORT || 3000
 
 export { PORT }

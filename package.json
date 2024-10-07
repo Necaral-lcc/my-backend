@@ -12,10 +12,21 @@
     "build": "rm -rf dist && tsc",
     "pro": "npx pm2 start ecosystem.config.js --env production",
     "restart": "pm2 restart ecosystem.config.js --env production",
-    "stop": "npx pm2 stop ecosystem.config.js"
+    "stop": "npx pm2 stop ecosystem.config.js",
+    "migrate:dev": "npx dotenv -e .env.development -- prisma migrate dev",
+    "migrate:deploy": "npx dotenv -e .env.production -- prisma migrate deploy",
+    "prisma:generate:dev": "npx dotenv -e .env.development -- prisma generate",
+    "prisma:generate:prod": "npx dotenv -e .env.production -- prisma generate",
+    "db:push:dev": "npx dotenv -e .env.development -- prisma db push",
+    "db:push:prod": "npx dotenv -e .env.production -- prisma db push",
+    "db:pull:dev": "npx dotenv -e .env.development -- prisma db pull",
+    "db:pull:prod": "npx dotenv -e .env.production --  prisma db pull",
+    "db:seed:dev": "npx dotenv -e .env.development -- prisma db seed",
+    "db:seed:prod": "npx dotenv -e .env.production -- prisma db seed"
   },
   "dependencies": {
     "@koa/router": "^13.0.0",
+    "@prisma/client": "^5.20.0",
     "@types/qs": "^6.9.16",
     "dotenv": "^16.4.5",
     "koa": "^2.15.3",
@@ -32,6 +43,7 @@
     "@types/ws": "^8.5.12",
     "nodemon": "^3.1.4",
     "pm2": "^5.4.2",
+    "prisma": "^5.20.0",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.5.4"
