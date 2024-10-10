@@ -6,6 +6,7 @@ import {
   deleteSelf,
   updateSelf,
 } from '@/controllerApp/user-controller'
+import { publishArticle } from '@/controllerApp//article-controller'
 
 export default [
   {
@@ -25,6 +26,12 @@ export default [
           // 查看他人资料
           { path: '/:id', type: 'get', action: viewUser },
         ],
+      },
+      //发表文章
+      {
+        name: 'article',
+        path: '/article',
+        routes: [{ path: '', type: 'post', action: publishArticle }],
       },
       //注册
       { path: '/register', type: 'post', action: registerUser },

@@ -4,11 +4,8 @@ import * as bodyParser from 'koa-bodyparser'
 import { PORT, SECRET_KEY, TOKEN_KEY } from './config'
 import routesAction from '@/routes'
 import { WebSocketService } from '@/websocket/websocket-service'
-import { WebSocketServer } from 'ws'
 import * as jwt from 'koa-jwt'
 import { formatResponse } from './utils'
-
-var http = require('http')
 
 const app = new Koa()
 const router = new Router()

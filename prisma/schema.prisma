@@ -9,27 +9,24 @@ datasource db {
 }
 
 model User {
-  id           Int       @id @default(autoincrement())
-  email        String    @unique
-  name         String?
-  age          Int?
-  password     String?
-  phone        String?
-  address      String?
-  description  String?
-  sex          Gender    @default(Unknown)
-  deletedFlag  Boolean   @default(false)
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @default(now()) @updatedAt
-  posts        Post[]
-  role         Role?     @relation("RoleToUser", fields: [roleId], references: [id])
-  roleId       Int?
-  dept         Dept?     @relation("DeptToUser", fields: [deptId], references: [id])
-  deptId       Int?
-  Menu         Menu[]    @relation("UserMenu")
-  createdMenus Menu[]    @relation("UserCreatedMenu")
-  updatedMenus Menu[]    @relation("UserUpdatedMenu")
-  article      Article[] @relation("UserWriteArticle")
+  id          Int       @id @default(autoincrement())
+  email       String    @unique
+  name        String?
+  age         Int?
+  password    String?
+  phone       String?
+  address     String?
+  description String?
+  sex         Gender    @default(Unknown)
+  deletedFlag Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now()) @updatedAt
+  posts       Post[]
+  role        Role?     @relation("RoleToUser", fields: [roleId], references: [id])
+  roleId      Int?
+  dept        Dept?     @relation("DeptToUser", fields: [deptId], references: [id])
+  deptId      Int?
+  articles    Article[] @relation("UserWriteArticle")
 }
 
 model Post {
@@ -47,31 +44,39 @@ model Post {
 }
 
 model Menu {
-  id          Int      @id @default(autoincrement())
+  id          Int          @id @default(autoincrement())
   name        String
   icon        String?
   path        String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  deletedFlag Boolean  @default(false)
-  parent      Menu?    @relation("MenuToMenu", fields: [parentId], references: [id])
-  children    Menu[]   @relation("MenuToMenu")
+  component   String?
+  redirect    String?
+  hidden      Boolean      @default(false)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  deletedFlag Boolean      @default(false)
+  parent      Menu?        @relation("MenuToMenu", fields: [parentId], references: [id])
+  children    Menu[]       @relation("MenuToMenu")
   parentId    Int?
-  createdById Int?
-  createdBy   User?    @relation("UserCreatedMenu", fields: [createdById], references: [id])
-  updatedById Int?
-  updatedBy   User?    @relation("UserUpdatedMenu", fields: [updatedById], references: [id])
-  User        User?    @relation("UserMenu", fields: [userId], references: [id])
-  userId      Int?
+  role        MenuOnRole[]
 }
 
 model Role {
-  id          Int      @id @default(autoincrement())
+  id          Int          @id @default(autoincrement())
   name        String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  deletedFlag Boolean  @default(false)
-  users       User[]   @relation("RoleToUser")
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  deletedFlag Boolean      @default(false)
+  users       User[]       @relation("RoleToUser")
+  menus       MenuOnRole[]
+}
+
+model MenuOnRole {
+  menuIds Int
+  menus   Menu @relation(fields: [menuIds], references: [id])
+  roleId  Int
+  role    Role @relation(fields: [roleId], references: [id])
+
+  @@id([roleId, menuIds])
 }
 
 model Dept {
@@ -84,15 +89,16 @@ model Dept {
 }
 
 model Article {
-  id          Int      @id @default(autoincrement())
+  id          Int           @id @default(autoincrement())
   title       String
   content     String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  deletedFlag Boolean  @default(false)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  deletedFlag Boolean       @default(false)
   authorId    Int?
-  author      User?    @relation("UserWriteArticle", fields: [authorId], references: [id])
-  tags        Tag[]    @relation("ArticleToTag")
+  author      User?         @relation("UserWriteArticle", fields: [authorId], references: [id])
+  tags        Tag[]         @relation("ArticleToTag")
+  examing     ExamingStatus @default(Saved)
 }
 
 model Tag {
@@ -108,4 +114,11 @@ enum Gender {
   Unknown
   MALE
   FEMALE
+}
+
+enum ExamingStatus {
+  Saved
+  Pending
+  Passed
+  Refused
 }

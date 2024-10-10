@@ -6,6 +6,7 @@ import {
   login,
   deleteSelf,
 } from '@/controllerAdmin/user-controller'
+import { createMenu, getMenu } from '@/controllerAdmin/menu-controller'
 
 export default [
   {
@@ -16,6 +17,14 @@ export default [
       { path: '/user/:id', type: 'put', action: updateUser },
       { path: '/user/:id', type: 'delete', action: deleteUser },
       { path: '/user', type: 'post', action: createUser },
+      {
+        name: 'system',
+        path: '/system',
+        routes: [
+          { path: '/menu', type: 'post', action: createMenu },
+          { path: '/menu/:id', type: 'get', action: getMenu },
+        ],
+      },
     ],
   },
 ]

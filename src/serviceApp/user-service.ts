@@ -64,58 +64,58 @@ class UserService {
     })
   }
 
-  create(email: string, password: string) {
+  getByEmailDeleted(email: string) {
     return new Promise((resolve, reject) => {
-      const userDeleted = prisma.user.findUnique({
+      const user = prisma.user.findUnique({
         where: {
           email,
           deletedFlag: true,
         },
       })
-      if (userDeleted) {
-        const user = prisma.user.update({
-          where: {
-            email,
-            deletedFlag: true,
-          },
-          data: {
-            deletedFlag: false,
-            password,
-          },
-          select: {
-            id: true,
-            email: true,
-          },
-        })
-        resolve(user)
-      } else {
-        const user = prisma.user.create({
-          data: {
-            email,
-            password,
-          },
-          select: {
-            id: true,
-            email: true,
-          },
-        })
-        resolve(user)
-      }
+      resolve(user)
+    })
+  }
+
+  create(email: string, password: string) {
+    return new Promise((resolve, reject) => {
+      const user = prisma.user.create({
+        data: {
+          email,
+          password,
+        },
+        select: {
+          id: true,
+          email: true,
+        },
+      })
+      resolve(user)
+    })
+  }
+
+  restore(email: string, password: string) {
+    return new Promise((resolve, reject) => {
+      const user = prisma.user.update({
+        where: {
+          email,
+          password,
+          deletedFlag: true,
+        },
+        data: {
+          deletedFlag: false,
+          password,
+        },
+        select: {
+          id: true,
+          email: true,
+        },
+      })
+      resolve(user)
     })
   }
 
   update(
     id: number,
-    {
-      name,
-      age,
-      sex,
-      address,
-      phone,
-      password,
-      role,
-      dept,
-    }: Prisma.UserUpdateInput
+    { name, age, sex, address, phone, password }: Prisma.UserUpdateInput
   ) {
     return new Promise((resolve, reject) => {
       const user = prisma.user.update({
@@ -129,8 +129,6 @@ class UserService {
           address,
           phone,
           password,
-          role,
-          dept,
         },
       })
       resolve(user)
