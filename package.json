@@ -28,9 +28,12 @@
     "@koa/router": "^13.0.0",
     "@prisma/client": "^5.20.0",
     "@types/qs": "^6.9.16",
+    "dayjs": "^1.11.13",
     "dotenv": "^16.4.5",
+    "jsonwebtoken": "^9.0.2",
     "koa": "^2.15.3",
     "koa-bodyparser": "^4.4.1",
+    "koa-jwt": "^4.0.4",
     "qs": "^6.13.0",
     "ws": "^8.18.0"
   },
