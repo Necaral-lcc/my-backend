@@ -8,6 +8,16 @@ import { PageParams } from './type'
 
 const prisma = new PrismaClient()
 
-class ArticleService {}
+class ArticleService {
+  publishArticle(id: number, { title, content }) {
+    return new Promise((resolve, reject) => {
+      const user = prisma.user.findUnique({
+        where: {
+          id: 1,
+        },
+      })
+    })
+  }
+}
 
 export default new ArticleService()
