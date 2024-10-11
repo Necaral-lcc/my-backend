@@ -9,13 +9,17 @@ import { PageParams } from './type'
 const prisma = new PrismaClient()
 
 class ArticleService {
-  publishArticle(id: number, { title, content }) {
+  publishArticle(
+    authorId: number,
+    { title, content, publishedAt }: Prisma.ArticleCreateInput
+  ) {
     return new Promise((resolve, reject) => {
       const article = prisma.article.create({
         data: {
           title,
           content,
-          authorId: id,
+          authorId,
+          publishedAt,
         },
         select: {
           id: true,
@@ -23,6 +27,7 @@ class ArticleService {
           content: true,
           createdAt: true,
           updatedAt: true,
+          publishedAt: true,
           author: {
             select: {
               id: true,
@@ -74,17 +79,21 @@ class ArticleService {
     })
   }
 
-  updateArticle(id: number, userId: number, { title, content, authorId }) {
+  updateArticle(
+    article_id: number,
+    userId: number,
+    { title, content, authorId }
+  ) {
     return new Promise((resolve, reject) => {
       const article = prisma.article.update({
         where: {
-          id,
+          id: article_id,
           authorId: userId,
         },
         data: {
           title,
           content,
-          authorId: id,
+          authorId,
         },
         select: {
           id: true,

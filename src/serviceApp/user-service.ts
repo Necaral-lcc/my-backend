@@ -83,9 +83,11 @@ class UserService {
           email,
           password,
         },
+
         select: {
           id: true,
           email: true,
+          createdAt: true,
         },
       })
       resolve(user)

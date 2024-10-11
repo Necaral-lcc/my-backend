@@ -1,3 +1,5 @@
+import * as moment from 'moment'
+
 export const isEmail = (email: string) => {
   const regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
   return regex.test(email)
@@ -20,4 +22,8 @@ export const formatResponse = (
     status,
     ...ext,
   }
+}
+
+export const utcOffset = (utc: string, offset: number) => {
+  return moment.utc(utc).utcOffset(offset).format('YYYY/MM/DD HH:mm:ss')
 }

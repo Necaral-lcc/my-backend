@@ -1,21 +1,27 @@
 import * as Koa from 'koa'
 import * as Router from '@koa/router'
 import * as bodyParser from 'koa-bodyparser'
+import * as jwt from 'koa-jwt'
 import { PORT, SECRET_KEY, TOKEN_KEY } from './config'
 import routesAction from '@/routes'
 import { WebSocketService } from '@/websocket/websocket-service'
-import * as jwt from 'koa-jwt'
 import { formatResponse } from './utils'
+import log4js from '@/middleware/log4js'
 
 const app = new Koa()
 const router = new Router()
 
 //路由及处理
-routesAction.forEach(({ path, type, action }) => router[type](path, action))
+routesAction.forEach(({ path, type, action }) => {
+  if (type) {
+    const r = router as any
+    r[type](path, action)
+  }
+})
+
+app.use(log4js())
 
 app.use(function (ctx, next) {
-  console.log(ctx.request.url)
-
   return next().catch((err) => {
     if (401 == err.status) {
       ctx.status = 401

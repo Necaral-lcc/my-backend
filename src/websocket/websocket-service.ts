@@ -7,7 +7,7 @@ var http = require('http')
 export class WebSocketService {
   static limit = 100
   private clients = new Map<string, WebSocket>()
-  private wss: WebSocketServer = null
+  private wss: WebSocketServer | null = null
 
   constructor(port: number, path: string = '/ws') {
     this.init(port, path)
@@ -24,15 +24,18 @@ export class WebSocketService {
       path,
     })
     this.wss.on('connection', async (client, req) => {
-      const [path, query] = req.url.split('?')
-      const params = qs.parse(query, { ignoreQueryPrefix: true })
+      let params: qs.ParsedQs = {}
+      if (req.url) {
+        const [path, query] = req.url.split('?')
+        params = qs.parse(query, { ignoreQueryPrefix: true })
+      }
       const token = params.token as string
       if (token) {
         if (
           this.clients.has(token) &&
-          this.clients.get(token).readyState === WebSocket.OPEN
+          this.clients.get(token)?.readyState === WebSocket.OPEN
         ) {
-          this.clients.get(token).close()
+          this.clients.get(token)?.close()
           this.clients.delete(token)
         }
         this.clients.set(token, client)

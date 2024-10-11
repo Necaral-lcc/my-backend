@@ -54,7 +54,7 @@ class UserService {
   }
 
   list(params: PageParams) {
-    const { pageSize, page, order, orderBy } = params
+    const { pageSize, page, order = 'id', orderBy } = params
     return new Promise((resolve, reject) => {
       const users = prisma.user.findMany({
         where: {
@@ -72,41 +72,21 @@ class UserService {
 
   create(email: string, password: string) {
     return new Promise((resolve, reject) => {
-      const userDeleted = prisma.user.findUnique({
+      const user = prisma.user.update({
         where: {
           email,
           deletedFlag: true,
         },
+        data: {
+          deletedFlag: false,
+          password,
+        },
+        select: {
+          id: true,
+          email: true,
+        },
       })
-      if (userDeleted) {
-        const user = prisma.user.update({
-          where: {
-            email,
-            deletedFlag: true,
-          },
-          data: {
-            deletedFlag: false,
-            password,
-          },
-          select: {
-            id: true,
-            email: true,
-          },
-        })
-        resolve(user)
-      } else {
-        const user = prisma.user.create({
-          data: {
-            email,
-            password,
-          },
-          select: {
-            id: true,
-            email: true,
-          },
-        })
-        resolve(user)
-      }
+      resolve(user)
     })
   }
 

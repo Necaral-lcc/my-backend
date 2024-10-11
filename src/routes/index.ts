@@ -25,6 +25,6 @@ const setRoutes = (list: IRoute[], prefix: string = ''): IRoute[] =>
       })
     }
     return acc
-  }, [])
+  }, [] as IRoute[])
 
 export default setRoutes([...adminList, ...appList])

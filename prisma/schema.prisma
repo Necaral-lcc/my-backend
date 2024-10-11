@@ -99,6 +99,7 @@ model Article {
   author      User?         @relation("UserWriteArticle", fields: [authorId], references: [id])
   tags        Tag[]         @relation("ArticleToTag")
   examing     ExamingStatus @default(Saved)
+  publishedAt DateTime?
 }
 
 model Tag {

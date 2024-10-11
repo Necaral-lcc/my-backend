@@ -8,6 +8,7 @@ import { Prisma } from '@prisma/client'
 import { isEmail, isPassword, formatResponse } from '@/utils'
 import * as jwt from 'jsonwebtoken'
 import { SECRET_KEY, TOKEN_KEY, JWT_EXPIRE_TIME } from '@/config'
+import * as dayjs from 'dayjs'
 
 /**
  * 用户发布单个文章
@@ -15,11 +16,14 @@ import { SECRET_KEY, TOKEN_KEY, JWT_EXPIRE_TIME } from '@/config'
  */
 export const publishArticle = async (ctx: Context) => {
   const { id, email } = ctx.state.user
-  const { title, content } = ctx.request.body as Prisma.ArticleCreateInput
+  const timezoneOffset = ctx.request.header['timezone-offset']
+  const { title, content, publishedAt } = ctx.request
+    .body as Prisma.ArticleCreateInput
   if (title && content) {
     const result = await articleService.publishArticle(Number(id), {
       title,
       content,
+      publishedAt: publishedAt ? dayjs(publishedAt).toString() : null,
     })
     if (result) {
       ctx.body = formatResponse(result, '发布成功')
