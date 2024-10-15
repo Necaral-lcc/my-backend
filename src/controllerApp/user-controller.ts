@@ -7,6 +7,7 @@ import { Prisma } from '@prisma/client'
 import { isEmail, isPassword, formatResponse } from '@/utils'
 import * as jwt from 'jsonwebtoken'
 import { SECRET_KEY, TOKEN_KEY, JWT_EXPIRE_TIME } from '@/config'
+import type { sJWT } from '@/types'
 
 /**
  * 用户注销
@@ -72,7 +73,7 @@ export const login = async (ctx: Context) => {
  * @param ctx
  */
 export const getUser = async (ctx: Context) => {
-  const { id } = ctx.state.user
+  const { id } = ctx.state.user as sJWT
   if (id > 0) {
     const res = await userService.get(Number(id))
     if (res) {
@@ -90,9 +91,7 @@ export const getUser = async (ctx: Context) => {
  * @param ctx
  */
 export const updateSelf = async (ctx: Context) => {
-  console.log('updateSelf', ctx.request.body)
-
-  const { id } = ctx.state.user
+  const { id } = ctx.state.user as sJWT
   const data = ctx.request.body as Prisma.UserUpdateInput
   if (!data || Object.keys(data).length === 0)
     ctx.body = formatResponse(null, '数据不能为空', 400)
@@ -110,7 +109,7 @@ export const updateSelf = async (ctx: Context) => {
  * @param ctx
  */
 export const deleteSelf = async (ctx: Context) => {
-  const { id } = ctx.state.user
+  const { id } = ctx.state.user as sJWT
   const user = await userService.get(Number(id))
   if (!user) {
     ctx.body = formatResponse(null, '用户不存在', 404)

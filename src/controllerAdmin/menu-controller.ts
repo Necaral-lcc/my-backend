@@ -13,7 +13,6 @@ import { SECRET_KEY, TOKEN_KEY, JWT_EXPIRE_TIME } from '@/config'
  * @param ctx
  */
 export const createMenu = async (ctx: Context) => {
-  const { id, email } = ctx.state.user
   const { name, icon, path, component, redirect, hidden, parentId } = ctx
     .request.body as Prisma.MenuCreateInput & { parentId: number }
   console.log(name, icon, path, component, redirect, hidden, parentId)

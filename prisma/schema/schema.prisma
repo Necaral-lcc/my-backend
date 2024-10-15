@@ -1,6 +1,6 @@
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["relationJoins"]
+  previewFeatures = ["relationJoins", "prismaSchemaFolder"]
 }
 
 datasource db {
@@ -27,6 +27,7 @@ model User {
   dept        Dept?     @relation("DeptToUser", fields: [deptId], references: [id])
   deptId      Int?
   articles    Article[] @relation("UserWriteArticle")
+  Order       Order[]   @relation("CustomerToOrder")
 }
 
 model Post {

@@ -1,0 +1,30 @@
+model Product {
+  id          Int                   @id @default(autoincrement())
+  name        String
+  avatar      String?
+  description String?
+  price       Float
+  createdAt   DateTime              @default(now())
+  updatedAt   DateTime              @updatedAt
+  orders      ProductOnOrder[]
+  categories  CategoriesOnProduct[]
+}
+
+model Category {
+  id        Int                   @id @default(autoincrement())
+  name      String
+  createdAt DateTime              @default(now())
+  updatedAt DateTime              @updatedAt
+  products  CategoriesOnProduct[]
+}
+
+model CategoriesOnProduct {
+  productId  Int
+  product    Product  @relation(fields: [productId], references: [id])
+  categoryId Int
+  category   Category @relation(fields: [categoryId], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([productId, categoryId])
+}

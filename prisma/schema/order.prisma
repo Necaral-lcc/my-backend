@@ -1,0 +1,18 @@
+model Order {
+  id         Int              @id @default(autoincrement())
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+  customer   User             @relation("CustomerToOrder", fields: [customerId], references: [id])
+  customerId Int
+  products   ProductOnOrder[]
+}
+
+model ProductOnOrder {
+  productId Int
+  product   Product @relation(fields: [productId], references: [id])
+  orderId   Int
+  order     Order   @relation(fields: [orderId], references: [id])
+  quantity  Int     @default(1)
+
+  @@id([productId, orderId])
+}

@@ -127,7 +127,7 @@ class HandleLogger extends CommonHandle {
   }
 
   // 错误日志
-  static errorLogger(ctx, error, time) {
+  static errorLogger(ctx: Koa.Context, error: any, time: number) {
     log4js.getLogger('errLogger').info(this.formatErrorLog(ctx, error, time))
   }
 }

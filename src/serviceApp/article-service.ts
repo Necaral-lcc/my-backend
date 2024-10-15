@@ -40,7 +40,7 @@ class ArticleService {
     })
   }
 
-  publishArticles(id, articles) {
+  publishArticles(id: number, articles: Prisma.ArticleCreateInput[]) {
     return new Promise((resolve, reject) => {
       const article = prisma.article.createMany({
         data: articles.map((article) => {
@@ -82,7 +82,11 @@ class ArticleService {
   updateArticle(
     article_id: number,
     userId: number,
-    { title, content, authorId }
+    {
+      title,
+      content,
+      authorId,
+    }: Prisma.ArticleUpdateInput & { authorId: number }
   ) {
     return new Promise((resolve, reject) => {
       const article = prisma.article.update({
