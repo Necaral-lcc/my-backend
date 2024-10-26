@@ -21,8 +21,6 @@ class UserService {
           id: true,
           email: true,
           name: true,
-          role: true,
-          dept: true,
         },
       })
       resolve(user)
@@ -92,16 +90,7 @@ class UserService {
 
   update(
     id: number,
-    {
-      name,
-      age,
-      sex,
-      address,
-      phone,
-      password,
-      role,
-      dept,
-    }: Prisma.UserUpdateInput
+    { name, age, sex, address, phone, password }: Prisma.UserUpdateInput
   ) {
     return new Promise((resolve, reject) => {
       const user = prisma.user.update({
@@ -115,8 +104,6 @@ class UserService {
           address,
           phone,
           password,
-          role,
-          dept,
         },
       })
       resolve(user)

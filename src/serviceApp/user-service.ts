@@ -21,8 +21,6 @@ class UserService {
           id: true,
           email: true,
           name: true,
-          role: true,
-          dept: true,
         },
       })
       resolve(user)
@@ -44,8 +42,6 @@ class UserService {
           sex: true,
           address: true,
           phone: true,
-          role: true,
-          dept: true,
         },
       })
       resolve(user)

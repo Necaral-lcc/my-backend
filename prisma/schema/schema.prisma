@@ -22,10 +22,6 @@ model User {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @default(now()) @updatedAt
   posts       Post[]
-  role        Role?     @relation("RoleToUser", fields: [roleId], references: [id])
-  roleId      Int?
-  dept        Dept?     @relation("DeptToUser", fields: [deptId], references: [id])
-  deptId      Int?
   articles    Article[] @relation("UserWriteArticle")
   Order       Order[]   @relation("CustomerToOrder")
 }
@@ -42,51 +38,6 @@ model Post {
   author    User?    @relation(fields: [authorId], references: [id])
 
   @@index([authorId], map: "Post_authorId_fkey")
-}
-
-model Menu {
-  id          Int          @id @default(autoincrement())
-  name        String
-  icon        String?
-  path        String?
-  component   String?
-  redirect    String?
-  hidden      Boolean      @default(false)
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  deletedFlag Boolean      @default(false)
-  parent      Menu?        @relation("MenuToMenu", fields: [parentId], references: [id])
-  children    Menu[]       @relation("MenuToMenu")
-  parentId    Int?
-  role        MenuOnRole[]
-}
-
-model Role {
-  id          Int          @id @default(autoincrement())
-  name        String
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  deletedFlag Boolean      @default(false)
-  users       User[]       @relation("RoleToUser")
-  menus       MenuOnRole[]
-}
-
-model MenuOnRole {
-  menuIds Int
-  menus   Menu @relation(fields: [menuIds], references: [id])
-  roleId  Int
-  role    Role @relation(fields: [roleId], references: [id])
-
-  @@id([roleId, menuIds])
-}
-
-model Dept {
-  id          Int      @id @default(autoincrement())
-  name        String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  deletedFlag Boolean  @default(false)
-  users       User[]   @relation("DeptToUser")
 }
 
 model Article {

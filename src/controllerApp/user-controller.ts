@@ -10,7 +10,7 @@ import { SECRET_KEY, TOKEN_KEY, JWT_EXPIRE_TIME } from '@/config'
 import type { sJWT } from '@/types'
 
 /**
- * 用户注销
+ * 用户注册
  * @param ctx
  */
 export const registerUser = async (ctx: Context) => {

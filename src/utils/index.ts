@@ -10,18 +10,29 @@ export const isPassword = (password: string) => {
   return regex.test(password)
 }
 
+interface sFormatResponse {
+  msg: string
+  data?: any
+  code: number
+  [key: string]: any
+}
+
 export const formatResponse = (
   data: any,
-  message: string = 'success',
-  status: number = 200,
+  msg: string = 'success',
+  code: number = 200,
   ext?: Object
 ) => {
-  return {
-    data,
-    message,
-    status,
+  let res: sFormatResponse = {
+    msg,
+    code,
     ...ext,
   }
+  if (data) {
+    res.data = data
+  }
+
+  return res
 }
 
 export const utcOffset = (utc: string, offset: number) => {

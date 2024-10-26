@@ -7,6 +7,10 @@ import {
   deleteSelf,
 } from '@/controllerAdmin/user-controller'
 import { createMenu, getMenu } from '@/controllerAdmin/menu-controller'
+import {
+  registerAdminUser,
+  loginAdminUser,
+} from '@/controllerAdmin/adminUser-controller'
 
 export default [
   {
@@ -24,6 +28,18 @@ export default [
           { path: '/menu', type: 'post', action: createMenu },
           { path: '/menu/:id', type: 'get', action: getMenu },
         ],
+      },
+      {
+        name: 'register-admin',
+        path: '/register',
+        type: 'post',
+        action: registerAdminUser,
+      },
+      {
+        name: 'login-admin',
+        path: '/login',
+        type: 'post',
+        action: loginAdminUser,
       },
     ],
   },

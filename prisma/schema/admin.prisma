@@ -1,0 +1,63 @@
+model AdminUser {
+  id          Int      @id @default(autoincrement())
+  email       String?
+  name        String   @unique
+  age         Int?
+  password    String
+  phone       String?
+  address     String?
+  description String?
+  status      Boolean? @default(true)
+  deletedFlag Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
+  role        Role?    @relation("RoleToUser", fields: [roleId], references: [id])
+  roleId      Int?
+  dept        Dept?    @relation("DeptToUser", fields: [deptId], references: [id])
+  deptId      Int?
+}
+
+model Menu {
+  id          Int          @id @default(autoincrement())
+  name        String
+  icon        String?
+  path        String?
+  component   String?
+  redirect    String?
+  hidden      Boolean      @default(false)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  deletedFlag Boolean      @default(false)
+  parent      Menu?        @relation("MenuToMenu", fields: [parentId], references: [id])
+  children    Menu[]       @relation("MenuToMenu")
+  parentId    Int?
+  role        MenuOnRole[]
+}
+
+model Role {
+  id          Int          @id @default(autoincrement())
+  name        String
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  deletedFlag Boolean      @default(false)
+  users       AdminUser[]  @relation("RoleToUser")
+  menus       MenuOnRole[]
+}
+
+model Dept {
+  id          Int         @id @default(autoincrement())
+  name        String
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  deletedFlag Boolean     @default(false)
+  users       AdminUser[] @relation("DeptToUser")
+}
+
+model MenuOnRole {
+  menuIds Int
+  menus   Menu @relation(fields: [menuIds], references: [id])
+  roleId  Int
+  role    Role @relation(fields: [roleId], references: [id])
+
+  @@id([roleId, menuIds])
+}
