@@ -1,0 +1,20 @@
+model file {
+  id          Int           @id @default(autoincrement())
+  name        String
+  content     String
+  createdAt   DateTime      @default(now())
+  userId      Int?
+  user        User?         @relation(fields: [userId], references: [id])
+  adminUserId Int?
+  adminUser   AdminUser?    @relation(fields: [adminUserId], references: [id])
+  uploadBy    FileUploadBy?
+  hash        String
+  size        Int
+  mimetype    String
+  extension   String
+}
+
+enum FileUploadBy {
+  USER
+  ADMIN
+}

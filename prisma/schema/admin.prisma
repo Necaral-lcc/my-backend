@@ -15,6 +15,7 @@ model AdminUser {
   roleId      Int?
   dept        Dept?    @relation("DeptToUser", fields: [deptId], references: [id])
   deptId      Int?
+  file        file[]
 }
 
 model Menu {

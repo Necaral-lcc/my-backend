@@ -1,0 +1,17 @@
+seajs.use(['jquery', 'vue2.5.16', 'qzact.lib', 'jssdk'], function () {
+                       
+                        seajs.use('qzactact2020dnf2021distclient.bundle.js');
+                   
+                    });
+
+                     report mta
+                    var _mtac = {performanceMonitor1};
+                    (function() {
+                        var mta = document.createElement(script);
+                        mta.src = pingjs.qq.comh5stats.jsv2.0.4;
+                        mta.setAttribute(name, MTAH5);
+                        mta.setAttribute(sid, 500675104);
+                        mta.setAttribute(cid, 500675105);
+                        var s = document.getElementsByTagName(script)[0];
+                        s.parentNode.insertBefore(mta, s);
+                    })();

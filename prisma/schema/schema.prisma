@@ -24,6 +24,7 @@ model User {
   posts       Post[]
   articles    Article[] @relation("UserWriteArticle")
   Order       Order[]   @relation("CustomerToOrder")
+  file        file[]
 }
 
 model Post {

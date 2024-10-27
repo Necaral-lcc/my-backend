@@ -12,10 +12,10 @@ const app = new Koa()
 const router = new Router()
 
 //路由及处理
-routesAction.forEach(({ path, type, action }) => {
+routesAction.forEach(({ path, type, action, middleware = [] }) => {
   if (type) {
     const r = router as any
-    r[type](path, action)
+    r[type](path, ...middleware, action)
   }
 })
 
