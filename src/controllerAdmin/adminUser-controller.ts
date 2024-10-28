@@ -6,18 +6,18 @@ import { Prisma } from '@prisma/client'
 import { isEmail, isPassword, formatResponse } from '@/utils'
 import * as jwt from 'jsonwebtoken'
 import { SECRET_KEY, TOKEN_KEY, JWT_EXPIRE_TIME } from '@/config'
-import type { sJWT } from '@/types'
 import adminUserService, {
   sAdminUserCreateParams,
 } from '@/serviceAdmin/adminUser-service'
 import { hashPassword, comparePassword } from '@/utils/bcrypt'
+import type { PageParams } from '@/serviceAdmin/type'
 
 /**
  * 管理员创建
  * @param ctx
  */
 export const registerAdminUser = async (ctx: Context) => {
-  const { name, password, email, roleId, deptId } = ctx.request
+  const { name, password, email, roleId, deptId, nickname } = ctx.request
     .body as sAdminUserCreateParams
   if (!name || !password) {
     ctx.body = formatResponse(null, '用户名或密码不能为空', 400)
@@ -44,9 +44,10 @@ export const registerAdminUser = async (ctx: Context) => {
     return
   }
 
-  const result = await adminUserService.create({
+  const result = await adminUserService.upsert({
     name,
     password: hashPasswordStr,
+    nickname,
     email,
     roleId,
     deptId,
@@ -82,4 +83,53 @@ export const loginAdminUser = async (ctx: Context) => {
   })
   ctx.response.set(TOKEN_KEY, token)
   ctx.body = formatResponse(null, '登录成功')
+}
+
+type sGetAdminUsersParams = Record<'page' | 'pageSize', string> & {
+  name?: string
+  email?: string
+}
+
+export const getAdminUsers = async (ctx: Context) => {
+  const params = ctx.query as unknown as sGetAdminUsersParams
+  const { page, pageSize, name, email } = params
+  console.log('params', params)
+
+  if (Number(page) <= 0) {
+    ctx.body = formatResponse(null, 'page参数必须大于0', 400)
+    return
+  }
+  if (Number(pageSize) < 1) {
+    ctx.body = formatResponse(null, 'pageSize参数必须大于1', 400)
+    return
+  }
+  console.log('getList')
+
+  const list = await adminUserService.list({
+    page: Number(page),
+    pageSize: Number(pageSize),
+    name,
+    email,
+  })
+  console.log('list', list)
+
+  if (list) {
+    ctx.body = formatResponse(list, '获取成功')
+  } else {
+    ctx.body = formatResponse(null, '获取失败', 500)
+  }
+}
+
+export const getAdminUser = async (ctx: Context) => {
+  const id = ctx.params.id as string
+  if (!id || !Number(id)) {
+    ctx.body = formatResponse(null, 'id不能为空', 400)
+    return
+  }
+  const adminUser = await adminUserService.detail(Number(id))
+  if (adminUser) {
+    ctx.body = formatResponse(adminUser, '获取成功')
+  } else {
+    ctx.body = formatResponse(null, '获取失败', 500)
+  }
 }

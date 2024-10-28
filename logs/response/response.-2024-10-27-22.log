@@ -1,5 +1,0 @@
-[2024-10-27T22:59:42.341] [INFO] resLogger - ------------response start------------response status: 200 
-response result: {"msg":"登录成功","code":200} 
-response all: {"request":{"method":"POST","url":"/admin-api/login","header":{"content-type":"application/json","user-agent":"PostmanRuntime/7.42.0","accept":"*/*","cache-control":"no-cache","postman-token":"6b3db699-e3d9-44e5-ab9e-d9501e5273a9","host":"localhost:3000","accept-encoding":"gzip, deflate, br","connection":"keep-alive","content-length":"56"}},"response":{"status":200,"message":"OK","header":{"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOm51bGwsImlhdCI6MTczMDA0MTE4MiwiZXhwIjoxNzMwMDc3MTgyfQ.vQcM8cQFv6-VbVIvXFrm3B7lPGnsrLHwI76cWBJOomU","content-type":"application/json; charset=utf-8"}},"app":{"subdomainOffset":2,"proxy":false,"env":"development"},"originalUrl":"/admin-api/login","req":"<original node req>","res":"<original node res>","socket":"<original node socket>"} 
-response time: 170 
-

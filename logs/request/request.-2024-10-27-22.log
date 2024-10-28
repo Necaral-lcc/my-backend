@@ -1,4 +1,0 @@
-[2024-10-27T22:59:42.172] [INFO] reqLogger - ------------request start------------request method: POST 
- request url: /admin-api/login 
-request data: {} 
-ctx all: {"request":{"method":"POST","url":"/admin-api/login","header":{"content-type":"application/json","user-agent":"PostmanRuntime/7.42.0","accept":"*/*","cache-control":"no-cache","postman-token":"6b3db699-e3d9-44e5-ab9e-d9501e5273a9","host":"localhost:3000","accept-encoding":"gzip, deflate, br","connection":"keep-alive","content-length":"56"}},"response":{"status":404,"message":"Not Found","header":{}},"app":{"subdomainOffset":2,"proxy":false,"env":"development"},"originalUrl":"/admin-api/login","req":"<original node req>","res":"<original node res>","socket":"<original node socket>"}

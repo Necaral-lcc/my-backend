@@ -16,6 +16,7 @@ routesAction.forEach(({ path, type, action, middleware = [] }) => {
   if (type) {
     const r = router as any
     r[type](path, ...middleware, action)
+    console.log(`注册路由${type} ${path}`)
   }
 })
 

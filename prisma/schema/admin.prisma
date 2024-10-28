@@ -2,6 +2,7 @@ model AdminUser {
   id          Int      @id @default(autoincrement())
   email       String?
   name        String   @unique
+  nickname    String?
   age         Int?
   password    String
   phone       String?
@@ -20,12 +21,17 @@ model AdminUser {
 
 model Menu {
   id          Int          @id @default(autoincrement())
-  name        String
-  icon        String?
+  name        String       @unique
   path        String?
-  component   String?
+  title       String?
+  icon        String?
+  component   String
   redirect    String?
-  hidden      Boolean      @default(false)
+  type        String       @default("folder")
+  status      Boolean      @default(true)
+  keepAlive   Boolean      @default(false)
+  needLogin   Boolean      @default(false)
+  link        String?
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
   deletedFlag Boolean      @default(false)
@@ -61,4 +67,11 @@ model MenuOnRole {
   role    Role @relation(fields: [roleId], references: [id])
 
   @@id([roleId, menuIds])
+}
+
+enum vMenuType {
+  folder
+  page
+  iframe
+  link
 }

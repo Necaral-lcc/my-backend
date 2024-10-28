@@ -13,9 +13,19 @@ import { SECRET_KEY, TOKEN_KEY, JWT_EXPIRE_TIME } from '@/config'
  * @param ctx
  */
 export const createMenu = async (ctx: Context) => {
-  const { name, icon, path, component, redirect, hidden, parentId } = ctx
-    .request.body as Prisma.MenuCreateInput & { parentId: number }
-  console.log(name, icon, path, component, redirect, hidden, parentId)
+  const {
+    name,
+    title,
+    icon,
+    path,
+    type,
+    component,
+    redirect,
+    status,
+    parentId,
+    keepAlive,
+    needLogin,
+  } = ctx.request.body as Prisma.MenuCreateInput & { parentId: number }
 
   if (name === undefined) {
     ctx.body = formatResponse(null, '请输入菜单名称')
@@ -32,11 +42,14 @@ export const createMenu = async (ctx: Context) => {
     const menu = await menuService.createMenu(
       {
         name,
+        title,
         icon,
         path,
         component,
         redirect,
-        hidden,
+        status,
+        keepAlive,
+        needLogin,
       },
       parentId
     )
@@ -48,11 +61,14 @@ export const createMenu = async (ctx: Context) => {
   } else {
     const menu = await menuService.createRootMenu({
       name,
+      title,
       icon,
       path,
       component,
       redirect,
-      hidden,
+      status,
+      keepAlive,
+      needLogin,
     })
     if (menu) {
       ctx.body = formatResponse(menu, '菜单创建成功')
@@ -76,4 +92,33 @@ export const getMenu = async (ctx: Context) => {
   }
 }
 
-export const getMenus = async (ctx: Context) => {}
+export const getMenus = async (ctx: Context) => {
+  const page = ctx.query.page || 1
+  const pageSize = ctx.query.pageSize || 10
+  if (!(typeof page === 'string') || isNaN(Number(page))) {
+    ctx.body = formatResponse(null, '请输入正确的页码')
+    return
+  }
+  if (!(typeof pageSize === 'string') || isNaN(Number(pageSize))) {
+    ctx.body = formatResponse(null, '请输入正确的每页条数')
+    return
+  }
+  const menus = await menuService.getMenuList({
+    page: Number(page),
+    pageSize: Number(pageSize),
+  })
+  if (menus) {
+    ctx.body = formatResponse(menus, '菜单列表获取成功')
+  } else {
+    ctx.body = formatResponse(null, '菜单列表获取失败')
+  }
+}
+
+export const getMenuTree = async (ctx: Context) => {
+  const menus = await menuService.getMenuTree()
+  if (menus) {
+    ctx.body = formatResponse(menus, '菜单树获取成功')
+  } else {
+    ctx.body = formatResponse(null, '菜单树获取失败')
+  }
+}

@@ -35,6 +35,20 @@ export const formatResponse = (
   return res
 }
 
+export const formatPageResponse = (
+  list: any[],
+  page: number,
+  pageSize: number,
+  total: number = 0
+) => {
+  return {
+    list,
+    total,
+    page,
+    pageSize,
+  }
+}
+
 export const utcOffset = (utc: string, offset: number) => {
   return moment.utc(utc).utcOffset(offset).format('YYYY/MM/DD HH:mm:ss')
 }

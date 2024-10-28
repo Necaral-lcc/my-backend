@@ -2,8 +2,6 @@ import { WebSocketServer } from 'ws'
 import { WebSocket } from 'ws'
 import * as qs from 'qs'
 
-var http = require('http')
-
 export class WebSocketService {
   static limit = 100
   private clients = new Map<string, WebSocket>()
@@ -18,7 +16,6 @@ export class WebSocketService {
   }
 
   private init(port: number, path = '/ws') {
-    console.log('init websocket service')
     this.wss = new WebSocketServer({
       port,
       path,
