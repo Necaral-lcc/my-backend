@@ -2,6 +2,7 @@ import { Prisma, PrismaClient } from '@prisma/client'
 import { Context } from 'koa'
 import { PageParams } from '../serviceApp/type'
 import { formatPageResponse } from '@/utils'
+import { DefaultArgs } from '@prisma/client/runtime/library'
 
 /**
  * Service用来处理逻辑，返回结果给Controller
@@ -10,79 +11,97 @@ import { formatPageResponse } from '@/utils'
 const prisma = new PrismaClient()
 
 class RoleService {
-  createRootMenu(data: Prisma.MenuCreateInput) {
-    const { name, icon, path, component, redirect, status } = data
+  createMenu(data: Prisma.MenuCreateInput, parentId: number | null = null) {
+    const {
+      name,
+      icon,
+      path,
+      component,
+      redirect,
+      status,
+      type,
+      title,
+      keepAlive,
+      needLogin,
+      link,
+    } = data
     return new Promise((resolve, reject) => {
       const menu = prisma.menu.create({
         data: {
           name,
-          component,
-          parentId: 0,
-        },
-        select: {
-          id: true,
-          name: true,
-          title: true,
-          icon: true,
-          component: true,
-          redirect: true,
-          status: true,
-          link: true,
-          path: true,
-          type: true,
-        },
-      })
-      resolve(menu)
-    })
-  }
-  createMenu(data: Prisma.MenuCreateInput, menuId: number = 0) {
-    const { name, icon, path, component, redirect, status, type } = data
-    return new Promise((resolve, reject) => {
-      const menu = prisma.menu.create({
-        data: {
-          name,
-          icon,
           path,
+          title,
+          icon,
           component,
-          type,
           redirect,
+          type,
           status,
-          parent: {
-            connect: {
-              id: menuId,
-            },
-          },
+          keepAlive,
+          needLogin,
+          link,
+          parentId,
         },
         select: {
           id: true,
           name: true,
+          path: true,
           title: true,
           icon: true,
           component: true,
           redirect: true,
-          status: true,
-          link: true,
-          path: true,
           type: true,
+          status: true,
+          keepAlive: true,
+          needLogin: true,
+          link: true,
+          parentId: true,
         },
       })
       resolve(menu)
     })
   }
 
-  getMenuById(id: number) {
+  getMenuById(id: number): Promise<
+    Prisma.Prisma__MenuClient<
+      {
+        name: string
+        title: string | null
+        icon: string | null
+        path: string | null
+        type: number
+        component: string | null
+        redirect: string | null
+        status: boolean
+        parentId: number | null
+        keepAlive: boolean
+        needLogin: boolean
+        link: string | null
+        id: number
+      } | null,
+      null,
+      DefaultArgs
+    >
+  > {
     return new Promise((resolve, reject) => {
       const menu = prisma.menu.findUnique({
         where: {
           id,
           deletedFlag: false,
         },
-        include: {
-          children: {
-            include: {
-              children: true,
-            },
-          },
+        select: {
+          id: true,
+          name: true,
+          path: true,
+          title: true,
+          icon: true,
+          component: true,
+          redirect: true,
+          type: true,
+          status: true,
+          keepAlive: true,
+          needLogin: true,
+          link: true,
+          parentId: true,
         },
       })
       resolve(menu)
@@ -94,7 +113,7 @@ class RoleService {
     return new Promise(async (resolve, reject) => {
       const where = {
         deletedFlag: false,
-        parentId: 0,
+        parentId: null,
       }
       const count = await prisma.menu.count({
         where,
@@ -138,7 +157,13 @@ class RoleService {
     })
   }
 
-  getMenuTree() {
+  getMenuTree(): Promise<
+    {
+      title: string | null
+      parentId: number | null
+      id: number
+    }[]
+  > {
     return new Promise(async (resolve, reject) => {
       const menus = await prisma.menu.findMany({
         where: {
@@ -147,11 +172,68 @@ class RoleService {
         },
         select: {
           id: true,
-          name: true,
+          title: true,
           parentId: true,
         },
       })
       resolve(menus)
+    })
+  }
+
+  updateMenu(
+    data: Prisma.MenuCreateInput & { parentId: number | null },
+    id: number
+  ) {
+    const {
+      name,
+      icon,
+      path,
+      component,
+      redirect,
+      status,
+      type,
+      title,
+      keepAlive,
+      needLogin,
+      link,
+      parentId,
+    } = data
+    return new Promise((resolve, reject) => {
+      const menu = prisma.menu.update({
+        where: {
+          id,
+        },
+        data: {
+          name,
+          path,
+          title,
+          icon,
+          component,
+          redirect,
+          type,
+          status,
+          keepAlive,
+          needLogin,
+          link,
+          parentId,
+        },
+        select: {
+          id: true,
+          name: true,
+          path: true,
+          title: true,
+          icon: true,
+          component: true,
+          redirect: true,
+          type: true,
+          status: true,
+          keepAlive: true,
+          needLogin: true,
+          link: true,
+          parentId: true,
+        },
+      })
+      resolve(menu)
     })
   }
 }

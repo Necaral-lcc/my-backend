@@ -56,7 +56,7 @@ class AdminUserService {
       const adminUser = prisma.adminUser.upsert({
         create: {
           name: data.name,
-          nickname: data.name,
+          nickname: data.nickname,
           email: data.email,
           password: data.password,
           roleId: data.roleId,
@@ -64,7 +64,7 @@ class AdminUserService {
         },
         update: {
           name: data.name,
-          nickname: data.name,
+          nickname: data.nickname,
           email: data.email,
           password: data.password,
           deletedFlag: false,

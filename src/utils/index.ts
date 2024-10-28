@@ -10,6 +10,11 @@ export const isPassword = (password: string) => {
   return regex.test(password)
 }
 
+export const isNumber = (num: string) => {
+  const regex = /^\d+$/
+  return regex.test(num)
+}
+
 interface sFormatResponse {
   msg: string
   data?: any

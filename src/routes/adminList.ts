@@ -11,6 +11,7 @@ import {
   getMenu,
   getMenus,
   getMenuTree,
+  updateMenu,
 } from '@/controllerAdmin/menu-controller'
 import {
   registerAdminUser,
@@ -34,19 +35,20 @@ export default [
         routes: [
           { path: '/menu', type: 'post', action: createMenu },
           { path: '/menu', type: 'get', action: getMenus },
-          { path: '/menuTree', type: 'get', action: getMenuTree },
           { path: '/menu/:id', type: 'get', action: getMenu },
+          { path: '/menu/:id', type: 'put', action: updateMenu },
+          { path: '/menuTree', type: 'get', action: getMenuTree },
           { path: '/adminUser', type: 'get', action: getAdminUsers },
           { path: '/adminUser/:id', type: 'get', action: getAdminUser },
           { path: '/adminUser', type: 'post', action: registerAdminUser },
         ],
       },
-      // {
-      //   name: 'register-admin',
-      //   path: '/register',
-      //   type: 'post',
-      //   action: registerAdminUser,
-      // },
+      {
+        name: 'register-admin',
+        path: '/register',
+        type: 'post',
+        action: registerAdminUser,
+      },
       {
         name: 'login-admin',
         path: '/login',
