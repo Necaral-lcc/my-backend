@@ -39,8 +39,8 @@ model Menu {
   parent      Menu?    @relation("MenuToMenu", fields: [parentId], references: [id])
   children    Menu[]   @relation("MenuToMenu")
 
-  parentId Int?
-  role     MenuOnRole[]
+  parentId   Int?
+  menuOnRole MenuOnRole[]
 }
 
 model Role {
@@ -50,7 +50,7 @@ model Role {
   updatedAt   DateTime     @updatedAt
   deletedFlag Boolean      @default(false)
   users       AdminUser[]  @relation("RoleToUser")
-  menus       MenuOnRole[]
+  menuOnRole  MenuOnRole[]
 }
 
 model Dept {
@@ -63,12 +63,12 @@ model Dept {
 }
 
 model MenuOnRole {
-  menuIds Int
-  menus   Menu @relation(fields: [menuIds], references: [id])
-  roleId  Int
-  role    Role @relation(fields: [roleId], references: [id])
+  menuId Int
+  menu   Menu @relation(fields: [menuId], references: [id])
+  roleId Int
+  role   Role @relation(fields: [roleId], references: [id])
 
-  @@id([roleId, menuIds])
+  @@id([roleId, menuId])
 }
 
 enum vMenuType {

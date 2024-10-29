@@ -9,7 +9,7 @@ interface IRoute {
   routes?: IRoute[]
   type?: string
   middleware?: Middleware[]
-  action?: (ctx: Context) => Promise<void>
+  action?: (ctx: Context) => Promise<void | Context>
 }
 
 const setRoutes = (list: IRoute[], prefix: string = ''): IRoute[] =>

@@ -17,6 +17,7 @@ export interface sAdminUserCreateParams {
   password: string
   roleId?: number
   deptId?: number
+  status?: boolean
 }
 
 type sAdminUserFind = Prisma.Prisma__AdminUserClient<
@@ -61,6 +62,7 @@ class AdminUserService {
           password: data.password,
           roleId: data.roleId,
           deptId: data.deptId,
+          status: data.status,
         },
         update: {
           name: data.name,
@@ -153,6 +155,76 @@ class AdminUserService {
           deptId: true,
           createdAt: true,
           updatedAt: true,
+        },
+      })
+      resolve(adminUser)
+    })
+  }
+  formDetail(id: number) {
+    return new Promise((resolve) => {
+      const adminUser = prisma.adminUser.findUnique({
+        where: {
+          id,
+          deletedFlag: false,
+        },
+        select: {
+          id: true,
+          name: true,
+          nickname: true,
+          email: true,
+          status: true,
+          roleId: true,
+          deptId: true,
+        },
+      })
+      resolve(adminUser)
+    })
+  }
+
+  getById(id: number) {
+    return new Promise((resolve) => {
+      const adminUser = prisma.adminUser.findUnique({
+        where: {
+          id,
+          deletedFlag: false,
+        },
+        select: {
+          id: true,
+          name: true,
+        },
+      })
+      resolve(adminUser)
+    })
+  }
+
+  update(id: number, data: Partial<sAdminUserCreateParams>) {
+    const { name, password, nickname, email, roleId, deptId, status } = data
+    return new Promise((resolve) => {
+      const adminUser = prisma.adminUser.update({
+        data: {
+          name,
+          nickname,
+          email,
+          password,
+          deletedFlag: false,
+          roleId,
+          deptId,
+          status,
+        },
+        where: {
+          id,
+          deletedFlag: false,
+        },
+        select: {
+          id: true,
+          name: true,
+          nickname: true,
+          email: true,
+          roleId: true,
+          deptId: true,
+          createdAt: true,
+          updatedAt: true,
+          status: true,
         },
       })
       resolve(adminUser)

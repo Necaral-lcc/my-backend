@@ -93,7 +93,6 @@ type sGetAdminUsersParams = Record<'page' | 'pageSize', string> & {
 export const getAdminUsers = async (ctx: Context) => {
   const params = ctx.query as unknown as sGetAdminUsersParams
   const { page, pageSize, name, email } = params
-  console.log('params', params)
 
   if (Number(page) <= 0) {
     ctx.body = formatResponse(null, 'page参数必须大于0', 400)
@@ -103,7 +102,6 @@ export const getAdminUsers = async (ctx: Context) => {
     ctx.body = formatResponse(null, 'pageSize参数必须大于1', 400)
     return
   }
-  console.log('getList')
 
   const list = await adminUserService.list({
     page: Number(page),
@@ -111,7 +109,6 @@ export const getAdminUsers = async (ctx: Context) => {
     name,
     email,
   })
-  console.log('list', list)
 
   if (list) {
     ctx.body = formatResponse(list, '获取成功')
@@ -120,16 +117,88 @@ export const getAdminUsers = async (ctx: Context) => {
   }
 }
 
+export const getAdminUserForm = async (ctx: Context) => {
+  const id = ctx.params.id as string
+  if (!id || !Number(id)) {
+    ctx.body = formatResponse(null, 'id不能为空', 400)
+    return
+  }
+  try {
+    const adminUser = await adminUserService.formDetail(Number(id))
+    if (adminUser) {
+      ctx.body = formatResponse(adminUser, '获取成功')
+    } else {
+      ctx.body = formatResponse(null, '获取失败', 500)
+    }
+  } catch (error) {
+    ctx.body = formatResponse(error, '获取失败', 500)
+  }
+}
 export const getAdminUser = async (ctx: Context) => {
   const id = ctx.params.id as string
   if (!id || !Number(id)) {
     ctx.body = formatResponse(null, 'id不能为空', 400)
     return
   }
-  const adminUser = await adminUserService.detail(Number(id))
-  if (adminUser) {
-    ctx.body = formatResponse(adminUser, '获取成功')
-  } else {
-    ctx.body = formatResponse(null, '获取失败', 500)
+  try {
+    const adminUser = await adminUserService.detail(Number(id))
+    if (adminUser) {
+      ctx.body = formatResponse(adminUser, '获取成功')
+    } else {
+      ctx.body = formatResponse(null, '获取失败', 500)
+    }
+  } catch (error) {
+    ctx.body = formatResponse(error, '获取失败', 500)
+  }
+}
+
+export const updateAdminUser = async (ctx: Context) => {
+  const id = ctx.params.id as string
+  const { name, password, email, roleId, deptId, nickname, status } = ctx
+    .request.body as sAdminUserCreateParams
+  if (!id || !Number(id)) {
+    ctx.body = formatResponse(null, 'id不能为空', 400)
+    return
+  }
+  try {
+    const repeat = await adminUserService.getById(Number(id))
+    if (!repeat) {
+      ctx.body = formatResponse(null, '用户已存在', 400)
+      return
+    }
+    if (password && !isPassword(password)) {
+      ctx.body = formatResponse(null, '密码格式不正确', 400)
+      return
+    }
+    if (email && !isEmail(email)) {
+      ctx.body = formatResponse(null, '邮箱格式不正确', 400)
+      return
+    }
+
+    let hashPasswordStr = undefined
+    try {
+      if (password) {
+        hashPasswordStr = await hashPassword(password)
+      }
+    } catch (error) {
+      ctx.body = formatResponse(null, '密码格式错误', 500)
+      return
+    }
+
+    const result = await adminUserService.update(Number(id), {
+      name,
+      nickname,
+      email,
+      roleId,
+      deptId,
+      status,
+    })
+    if (result) {
+      ctx.body = formatResponse(result, '创建成功')
+    } else {
+      ctx.body = formatResponse(null, '创建失败', 500)
+    }
+  } catch (error) {
+    ctx.body = formatResponse(error, '更新失败', 500)
   }
 }

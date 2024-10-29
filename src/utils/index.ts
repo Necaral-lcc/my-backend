@@ -10,7 +10,7 @@ export const isPassword = (password: string) => {
   return regex.test(password)
 }
 
-export const isNumber = (num: string) => {
+export const isNumber = (num: any) => {
   const regex = /^\d+$/
   return regex.test(num)
 }

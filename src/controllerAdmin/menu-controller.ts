@@ -27,7 +27,6 @@ export const createMenu = async (ctx: Context) => {
     needLogin,
     link,
   } = ctx.request.body as Prisma.MenuCreateInput & { parentId: number }
-  console.log(ctx.request.body)
 
   if (name === undefined) {
     ctx.body = formatResponse(null, '请输入菜单名称')

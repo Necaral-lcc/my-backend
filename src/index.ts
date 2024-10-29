@@ -25,7 +25,6 @@ app.use(log4js())
 app.use(function (ctx, next) {
   return next().catch((err) => {
     if (401 == err.status) {
-      ctx.status = 401
       ctx.body = formatResponse(null, '请登录后再进行操作', 401)
     } else {
       throw err

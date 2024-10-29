@@ -16,7 +16,6 @@ const uploadFiles = async (ctx: Context) => {
     return
   }
   const files = ctx.files as multer.File[]
-  console.log('ctx.files', ctx.files)
   try {
     const res = await Promise.all(
       files.map(async (file) => {

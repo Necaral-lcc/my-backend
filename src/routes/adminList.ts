@@ -17,8 +17,17 @@ import {
   registerAdminUser,
   loginAdminUser,
   getAdminUsers,
-  getAdminUser,
+  getAdminUserForm,
+  updateAdminUser,
 } from '@/controllerAdmin/adminUser-controller'
+import {
+  createRole,
+  getRoles,
+  getRole,
+  updateRole,
+  deleteRole,
+  getRoleOptions,
+} from '@/controllerAdmin/role-controller'
 
 export default [
   {
@@ -33,14 +42,24 @@ export default [
         name: 'system',
         path: '/system',
         routes: [
+          // 菜单
           { path: '/menu', type: 'post', action: createMenu },
           { path: '/menu', type: 'get', action: getMenus },
+          { path: '/menu/options', type: 'get', action: getMenuTree },
           { path: '/menu/:id', type: 'get', action: getMenu },
           { path: '/menu/:id', type: 'put', action: updateMenu },
-          { path: '/menuTree', type: 'get', action: getMenuTree },
+          // 管理员
           { path: '/adminUser', type: 'get', action: getAdminUsers },
-          { path: '/adminUser/:id', type: 'get', action: getAdminUser },
+          { path: '/adminUser/:id', type: 'get', action: getAdminUserForm },
+          { path: '/adminUser/:id', type: 'put', action: updateAdminUser },
           { path: '/adminUser', type: 'post', action: registerAdminUser },
+          // 角色
+          { path: '/role', type: 'get', action: getRoles },
+          { path: '/role/options', type: 'get', action: getRoleOptions },
+          { path: '/role/:id', type: 'get', action: getRole },
+          { path: '/role/:id', type: 'put', action: updateRole },
+          { path: '/role/:id', type: 'delete', action: deleteRole },
+          { path: '/role', type: 'post', action: createRole },
         ],
       },
       {

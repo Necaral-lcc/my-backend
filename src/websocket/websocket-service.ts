@@ -38,7 +38,6 @@ export class WebSocketService {
         this.clients.set(token, client)
 
         client.on('message', function message(data) {
-          console.log('received: %s', data)
           client.send(JSON.stringify({ message: 'hello', params, path }))
         })
       } else {
