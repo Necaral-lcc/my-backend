@@ -10,7 +10,7 @@ import {
   createMenu,
   getMenu,
   getMenus,
-  getMenuTree,
+  getMenuOptions,
   updateMenu,
 } from '@/controllerAdmin/menu-controller'
 import {
@@ -45,7 +45,7 @@ export default [
           // 菜单
           { path: '/menu', type: 'post', action: createMenu },
           { path: '/menu', type: 'get', action: getMenus },
-          { path: '/menu/options', type: 'get', action: getMenuTree },
+          { path: '/menu/options', type: 'get', action: getMenuOptions },
           { path: '/menu/:id', type: 'get', action: getMenu },
           { path: '/menu/:id', type: 'put', action: updateMenu },
           // 管理员

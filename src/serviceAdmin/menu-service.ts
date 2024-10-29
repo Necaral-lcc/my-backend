@@ -137,6 +137,9 @@ class RoleService {
           link: true,
           path: true,
           type: true,
+          createdAt: true,
+          permission: true,
+          updatedAt: true,
           children: {
             select: {
               id: true,
@@ -149,6 +152,26 @@ class RoleService {
               link: true,
               path: true,
               type: true,
+              permission: true,
+              createdAt: true,
+              updatedAt: true,
+              children: {
+                select: {
+                  id: true,
+                  name: true,
+                  title: true,
+                  icon: true,
+                  component: true,
+                  redirect: true,
+                  status: true,
+                  link: true,
+                  path: true,
+                  type: true,
+                  permission: true,
+                  createdAt: true,
+                  updatedAt: true,
+                },
+              },
             },
           },
         },
@@ -157,7 +180,7 @@ class RoleService {
     })
   }
 
-  getMenuTree(): Promise<
+  getMenuOptions(): Promise<
     {
       title: string | null
       parentId: number | null
@@ -169,6 +192,35 @@ class RoleService {
         where: {
           deletedFlag: false,
           status: true,
+        },
+        select: {
+          id: true,
+          title: true,
+          parentId: true,
+        },
+      })
+      resolve(menus)
+    })
+  }
+  getMenuOptionsWithoutBtn(): Promise<
+    {
+      title: string | null
+      parentId: number | null
+      id: number
+    }[]
+  > {
+    return new Promise(async (resolve, reject) => {
+      const menus = await prisma.menu.findMany({
+        where: {
+          OR: [
+            {
+              deletedFlag: false,
+              status: true,
+            },
+          ],
+          NOT: {
+            type: 3,
+          },
         },
         select: {
           id: true,
@@ -197,6 +249,7 @@ class RoleService {
       needLogin,
       link,
       parentId,
+      permission,
     } = data
     return new Promise((resolve, reject) => {
       const menu = prisma.menu.update({
@@ -216,6 +269,7 @@ class RoleService {
           needLogin,
           link,
           parentId,
+          permission,
         },
         select: {
           id: true,
@@ -231,6 +285,7 @@ class RoleService {
           needLogin: true,
           link: true,
           parentId: true,
+          permission: true,
         },
       })
       resolve(menu)

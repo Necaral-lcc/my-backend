@@ -104,8 +104,8 @@ export const getMenus = async (ctx: Context) => {
   }
 }
 
-export const getMenuTree = async (ctx: Context) => {
-  const menus = await menuService.getMenuTree()
+export const getMenuOptions = async (ctx: Context) => {
+  const menus = await menuService.getMenuOptions()
   if (menus) {
     menus.forEach((menu) => {
       if (menu.parentId === null) {
@@ -143,6 +143,7 @@ export const updateMenu = async (ctx: Context) => {
       keepAlive,
       needLogin,
       link,
+      permission,
     } = ctx.request.body as Prisma.MenuCreateInput & { parentId: number }
     let parent_id = parentId == 0 ? null : parentId
     try {
@@ -160,16 +161,17 @@ export const updateMenu = async (ctx: Context) => {
           needLogin,
           link,
           parentId: parent_id,
+          permission,
         },
         Number(id)
       )
       if (menu) {
         ctx.body = formatResponse(menu, '菜单更新成功')
       } else {
-        ctx.body = formatResponse(null, '菜单更新失败')
+        ctx.body = formatResponse(null, '菜单更新失败', 500)
       }
     } catch (e) {
-      ctx.body = formatResponse(e, '菜单更新失败')
+      ctx.body = formatResponse(e, '菜单更新失败', 500)
     }
   }
 }
