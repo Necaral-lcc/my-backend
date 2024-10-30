@@ -1,7 +1,7 @@
 import { Prisma, PrismaClient } from '@prisma/client'
 import { Context } from 'koa'
 import { PageParams } from '../serviceApp/type'
-import { formatPageResponse } from '@/utils'
+import { formatPageResponse, sPageResponse } from '@/utils'
 import { DefaultArgs } from '@prisma/client/runtime/library'
 
 /**
@@ -10,7 +10,7 @@ import { DefaultArgs } from '@prisma/client/runtime/library'
 
 const prisma = new PrismaClient()
 
-class RoleService {
+class MenuService {
   createMenu(data: Prisma.MenuCreateInput, parentId: number | null = null) {
     const {
       name,
@@ -24,10 +24,15 @@ class RoleService {
       keepAlive,
       needLogin,
       link,
+      permission,
     } = data
     return new Promise((resolve, reject) => {
-      const menu = prisma.menu.create({
-        data: {
+      const menu = prisma.menu.upsert({
+        where: {
+          name,
+          deletedFlag: true,
+        },
+        create: {
           name,
           path,
           title,
@@ -40,6 +45,22 @@ class RoleService {
           needLogin,
           link,
           parentId,
+          permission,
+        },
+        update: {
+          path,
+          title,
+          icon,
+          component,
+          redirect,
+          type,
+          status,
+          keepAlive,
+          needLogin,
+          link,
+          parentId,
+          permission,
+          deletedFlag: false,
         },
         select: {
           id: true,
@@ -55,6 +76,7 @@ class RoleService {
           needLogin: true,
           link: true,
           parentId: true,
+          permission: true,
         },
       })
       resolve(menu)
@@ -102,30 +124,38 @@ class RoleService {
           needLogin: true,
           link: true,
           parentId: true,
+          permission: true,
         },
       })
       resolve(menu)
     })
   }
 
-  getMenuList(params: PageParams) {
-    const { page, pageSize } = params
+  getMenuList(): Promise<
+    {
+      id: number
+      name: string
+      path: string | null
+      title: string | null
+      icon: string | null
+      component: string | null
+      redirect: string | null
+      type: number
+      status: boolean
+      link: string | null
+      permission: string | null
+      createdAt: Date
+      updatedAt: Date
+      parentId: number | null
+    }[]
+  > {
     return new Promise(async (resolve, reject) => {
       const where = {
         deletedFlag: false,
-        parentId: null,
       }
-      const count = await prisma.menu.count({
-        where,
-      })
-      if (count === 0) {
-        resolve(formatPageResponse([], page, pageSize, count))
-        return
-      }
+
       const menus = await prisma.menu.findMany({
         where,
-        skip: (page - 1) * pageSize,
-        take: pageSize,
         select: {
           id: true,
           name: true,
@@ -140,43 +170,10 @@ class RoleService {
           createdAt: true,
           permission: true,
           updatedAt: true,
-          children: {
-            select: {
-              id: true,
-              name: true,
-              title: true,
-              icon: true,
-              component: true,
-              redirect: true,
-              status: true,
-              link: true,
-              path: true,
-              type: true,
-              permission: true,
-              createdAt: true,
-              updatedAt: true,
-              children: {
-                select: {
-                  id: true,
-                  name: true,
-                  title: true,
-                  icon: true,
-                  component: true,
-                  redirect: true,
-                  status: true,
-                  link: true,
-                  path: true,
-                  type: true,
-                  permission: true,
-                  createdAt: true,
-                  updatedAt: true,
-                },
-              },
-            },
-          },
+          parentId: true,
         },
       })
-      resolve(formatPageResponse(menus, page, pageSize, count))
+      resolve(menus)
     })
   }
 
@@ -291,6 +288,24 @@ class RoleService {
       resolve(menu)
     })
   }
+
+  delete(id: number) {
+    return new Promise((resolve, reject) => {
+      const menu = prisma.menu.update({
+        where: {
+          id,
+        },
+        data: {
+          deletedFlag: true,
+        },
+        select: {
+          id: true,
+          name: true,
+        },
+      })
+      resolve(menu)
+    })
+  }
 }
 
-export default new RoleService()
+export default new MenuService()

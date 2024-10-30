@@ -40,12 +40,19 @@ export const formatResponse = (
   return res
 }
 
-export const formatPageResponse = (
+export interface sPageResponse<T> {
+  list: T[]
+  total: number
+  page: number
+  pageSize: number
+}
+
+export const formatPageResponse = <T = any>(
   list: any[],
   page: number,
   pageSize: number,
   total: number = 0
-) => {
+): sPageResponse<T> => {
   return {
     list,
     total,

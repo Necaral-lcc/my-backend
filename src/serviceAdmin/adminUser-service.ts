@@ -230,6 +230,174 @@ class AdminUserService {
       resolve(adminUser)
     })
   }
+
+  delete(id: number) {
+    return new Promise((resolve) => {
+      const adminUser = prisma.adminUser.update({
+        data: {
+          deletedFlag: true,
+        },
+        where: {
+          id,
+          deletedFlag: false,
+        },
+        select: {
+          id: true,
+          name: true,
+          nickname: true,
+          email: true,
+          roleId: true,
+          deptId: true,
+          createdAt: true,
+          updatedAt: true,
+          status: true,
+        },
+      })
+      resolve(adminUser)
+    })
+  }
+
+  getAdminUserInfo(id: number): Promise<
+    Prisma.Prisma__AdminUserClient<
+      {
+        email: string | null
+        name: string
+        nickname: string | null
+        id: number
+      } | null,
+      null,
+      DefaultArgs
+    >
+  > {
+    return new Promise((resolve) => {
+      const adminUser = prisma.adminUser.findUnique({
+        where: {
+          id,
+          deletedFlag: false,
+        },
+        select: {
+          id: true,
+          name: true,
+          nickname: true,
+          email: true,
+        },
+      })
+      resolve(adminUser)
+    })
+  }
+  getAdminUserRoutes(id: number): Promise<
+    Prisma.Prisma__AdminUserClient<
+      {
+        role: {
+          menuOnRole: {
+            menu: {
+              id: number
+              name: string
+              path: string | null
+              title: string | null
+              icon: string | null
+              component: string | null
+              redirect: string | null
+              type: number
+              link: string | null
+              parentId: number | null
+              permission: string | null
+              keepAlive: boolean | null
+              needLogin: boolean | null
+            }
+          }[]
+        } | null
+      } | null,
+      null,
+      DefaultArgs
+    >
+  > {
+    return new Promise((resolve) => {
+      const adminUser = prisma.adminUser.findUnique({
+        where: {
+          id,
+          deletedFlag: false,
+        },
+        select: {
+          role: {
+            select: {
+              menuOnRole: {
+                select: {
+                  menu: {
+                    select: {
+                      id: true,
+                      name: true,
+                      title: true,
+                      icon: true,
+                      component: true,
+                      redirect: true,
+                      link: true,
+                      path: true,
+                      type: true,
+                      keepAlive: true,
+                      needLogin: true,
+                      parentId: true,
+                      permission: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      })
+      resolve(adminUser)
+    })
+  }
+
+  getAdminUserPermission(
+    id: number,
+    per: string
+  ): Promise<
+    Prisma.Prisma__AdminUserClient<
+      {
+        role: {
+          menuOnRole: {
+            menu: {
+              permission: string | null
+            }
+          }[]
+        } | null
+      } | null,
+      null,
+      DefaultArgs
+    >
+  > {
+    return new Promise((resolve, reject) => {
+      const permission = prisma.adminUser.findFirst({
+        where: {
+          id,
+          deletedFlag: false,
+        },
+        select: {
+          role: {
+            select: {
+              menuOnRole: {
+                where: {
+                  menu: {
+                    permission: per,
+                  },
+                },
+                select: {
+                  menu: {
+                    select: {
+                      permission: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      })
+      resolve(permission)
+    })
+  }
 }
 
 export default new AdminUserService()

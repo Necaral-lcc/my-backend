@@ -2,7 +2,6 @@
  * Controller用于接受数据、返回数据给前端
  */
 import { Context } from 'koa'
-import { Prisma } from '@prisma/client'
 import { isEmail, isPassword, formatResponse } from '@/utils'
 import * as jwt from 'jsonwebtoken'
 import { SECRET_KEY, TOKEN_KEY, JWT_EXPIRE_TIME } from '@/config'
@@ -10,7 +9,8 @@ import adminUserService, {
   sAdminUserCreateParams,
 } from '@/serviceAdmin/adminUser-service'
 import { hashPassword, comparePassword } from '@/utils/bcrypt'
-import type { PageParams } from '@/serviceAdmin/type'
+import { sJWT } from '@/types'
+import { sAdminUserInfo } from './type'
 
 /**
  * 管理员创建
@@ -192,6 +192,7 @@ export const updateAdminUser = async (ctx: Context) => {
       roleId,
       deptId,
       status,
+      password: hashPasswordStr,
     })
     if (result) {
       ctx.body = formatResponse(result, '创建成功')
@@ -200,5 +201,63 @@ export const updateAdminUser = async (ctx: Context) => {
     }
   } catch (error) {
     ctx.body = formatResponse(error, '更新失败', 500)
+  }
+}
+
+export const deleteAdminUser = async (ctx: Context) => {
+  const id = ctx.params.id as string
+  if (!id || !Number(id)) {
+    ctx.body = formatResponse(null, 'id不能为空', 400)
+    return
+  }
+  try {
+    const result = await adminUserService.delete(Number(id))
+    if (result) {
+      ctx.body = formatResponse(null, '删除成功')
+    } else {
+      ctx.body = formatResponse(null, '删除失败', 500)
+    }
+  } catch (error) {
+    ctx.body = formatResponse(error, '删除失败', 500)
+  }
+}
+
+export const getAdminUserInfo = async (ctx: Context) => {
+  const { id } = ctx.state.user as sJWT
+  const user: Partial<sAdminUserInfo> = {}
+  try {
+    const adminUser = await adminUserService.getAdminUserInfo(id)
+    if (adminUser) {
+      user.info = adminUser
+    } else {
+      ctx.body = formatResponse(null, '获取失败', 500)
+      return
+    }
+    const userRouteRes = await adminUserService.getAdminUserRoutes(id)
+    if (userRouteRes) {
+      const userRoutes =
+        userRouteRes?.role?.menuOnRole.map((item) => {
+          return item.menu
+        }) || []
+      user.routes = userRoutes
+        .filter((item) => item.type != 4)
+        .map((item) => ({
+          ...item,
+          parentId: item.parentId || 0,
+        }))
+      user.permission = userRoutes.reduce((acc, cur) => {
+        if (cur.permission) {
+          return acc.concat(cur.permission)
+        } else {
+          return acc
+        }
+      }, [] as string[])
+    } else {
+      ctx.body = formatResponse(null, '获取失败', 500)
+      return
+    }
+    ctx.body = formatResponse(user, '获取成功')
+  } catch (error) {
+    ctx.body = formatResponse(error, '获取失败', 500)
   }
 }

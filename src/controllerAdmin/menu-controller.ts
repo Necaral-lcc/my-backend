@@ -7,6 +7,7 @@ import { Prisma } from '@prisma/client'
 import { isEmail, isPassword, formatResponse, isNumber } from '@/utils'
 import * as jwt from 'jsonwebtoken'
 import { SECRET_KEY, TOKEN_KEY, JWT_EXPIRE_TIME } from '@/config'
+import { listToTree } from '@/utils/tool'
 
 /**
  * 用户创建权限菜单
@@ -26,6 +27,7 @@ export const createMenu = async (ctx: Context) => {
     keepAlive,
     needLogin,
     link,
+    permission,
   } = ctx.request.body as Prisma.MenuCreateInput & { parentId: number }
 
   if (name === undefined) {
@@ -52,6 +54,7 @@ export const createMenu = async (ctx: Context) => {
         keepAlive,
         needLogin,
         link,
+        permission,
       },
       parent_id
     )
@@ -82,23 +85,15 @@ export const getMenu = async (ctx: Context) => {
   }
 }
 
+/**
+ * 获取菜单列表
+ * @description 菜单列表，树形结构，父节点为null转0
+ * @param ctx
+ */
 export const getMenus = async (ctx: Context) => {
-  const page = ctx.query.page || 1
-  const pageSize = ctx.query.pageSize || 10
-  if (!(typeof page === 'string') || isNaN(Number(page))) {
-    ctx.body = formatResponse(null, '请输入正确的页码')
-    return
-  }
-  if (!(typeof pageSize === 'string') || isNaN(Number(pageSize))) {
-    ctx.body = formatResponse(null, '请输入正确的每页条数')
-    return
-  }
-  const menus = await menuService.getMenuList({
-    page: Number(page),
-    pageSize: Number(pageSize),
-  })
+  const menus = await menuService.getMenuList()
   if (menus) {
-    ctx.body = formatResponse(menus, '菜单列表获取成功')
+    ctx.body = formatResponse(listToTree(menus, null), '菜单列表获取成功')
   } else {
     ctx.body = formatResponse(null, '菜单列表获取失败')
   }
@@ -172,6 +167,27 @@ export const updateMenu = async (ctx: Context) => {
       }
     } catch (e) {
       ctx.body = formatResponse(e, '菜单更新失败', 500)
+    }
+  }
+}
+
+export const deleteMenu = async (ctx: Context) => {
+  const { id } = ctx.params
+  if (isNumber(id) && Number(id) > 0) {
+    try {
+      const menuExists = await menuService.getMenuById(Number(id))
+      if (!menuExists) {
+        ctx.body = formatResponse(null, '菜单不存在', 500)
+        return
+      }
+      const menu = await menuService.delete(Number(id))
+      if (menu) {
+        ctx.body = formatResponse(null, '菜单删除成功')
+      } else {
+        ctx.body = formatResponse(null, '菜单删除失败', 500)
+      }
+    } catch (e) {
+      ctx.body = formatResponse(e, '菜单删除失败', 500)
     }
   }
 }
