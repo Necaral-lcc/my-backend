@@ -3,7 +3,7 @@ import adminList from './adminList'
 import appList from './appList'
 import uploadList from './upload'
 
-interface IRoute {
+export interface IRoute {
   name?: string
   path: string
   routes?: IRoute[]

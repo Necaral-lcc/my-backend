@@ -28,6 +28,7 @@ const uploadFiles = async (ctx: Context) => {
     ctx.body = formatResponse(err, '上传失败')
   }
 }
+
 const uploadFile = async (ctx: Context) => {
   console.log('ctx.file', ctx.file)
   const res = await uploadPromise(ctx.file)
