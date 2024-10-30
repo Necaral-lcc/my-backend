@@ -78,9 +78,17 @@ log4js.configure({
   },
 })
 
+/**
+ * 通用日志处理类
+ */
 class CommonHandle {
   constructor() {}
-  // 格式化请求日志
+  /**
+   * 格式化请求日志
+   * @param ctx
+   * @param time
+   * @returns
+   */
   static formatReqLog(ctx: Koa.Context, time: number = 0) {
     let text = '------------request start------------'
     let method = ctx.method
@@ -93,7 +101,12 @@ class CommonHandle {
     text += `ctx all: ${JSON.stringify(ctx)}`
     return text
   }
-  // 格式化相应日志
+  /**
+   * 格式化响应日志
+   * @param ctx
+   * @param time
+   * @returns
+   */
   static formatResLog(ctx: Koa.Context, time: number = 0) {
     let text = '------------response start------------'
     text += `response status: ${ctx.status} \n`
@@ -102,7 +115,13 @@ class CommonHandle {
     text += `response time: ${time} \n`
     return text
   }
-  // 格式化错误日志
+  /**
+   * 格式化错误日志
+   * @param ctx
+   * @param error
+   * @param time
+   * @returns
+   */
   static formatErrorLog(ctx: Koa.Context, error: any, time: number = 0) {
     let text = '------------error start------------'
     text += this.formatResLog(ctx, time)
