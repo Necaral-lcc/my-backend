@@ -306,6 +306,47 @@ class MenuService {
       resolve(menu)
     })
   }
+
+  getAdminMenus(): Promise<
+    {
+      name: string
+      icon: string | null
+      path: string | null
+      component: string | null
+      redirect: string | null
+      type: number
+      title: string | null
+      keepAlive: boolean
+      needLogin: boolean
+      link: string | null
+      parentId: number | null
+      id: number
+    }[]
+  > {
+    return new Promise(async (resolve, reject) => {
+      const menus = await prisma.menu.findMany({
+        where: {
+          deletedFlag: false,
+          status: true,
+        },
+        select: {
+          id: true,
+          name: true,
+          title: true,
+          icon: true,
+          component: true,
+          redirect: true,
+          link: true,
+          path: true,
+          type: true,
+          keepAlive: true,
+          needLogin: true,
+          parentId: true,
+        },
+      })
+      resolve(menus)
+    })
+  }
 }
 
 export default new MenuService()

@@ -11,6 +11,7 @@ import adminUserService, {
 import { hashPassword, comparePassword } from '@/utils/bcrypt'
 import { sJWT } from '@/types'
 import { sAdminUserInfo } from './type'
+import menuService from '@/serviceAdmin/menu-service'
 
 /**
  * 管理员创建
@@ -233,29 +234,38 @@ export const getAdminUserInfo = async (ctx: Context) => {
       ctx.body = formatResponse(null, '获取失败', 500)
       return
     }
-    const userRouteRes = await adminUserService.getAdminUserRoutes(id)
-    if (userRouteRes) {
-      const userRoutes =
-        userRouteRes?.role?.menuOnRole.map((item) => {
-          return item.menu
-        }) || []
-      user.routes = userRoutes
-        .filter((item) => item.type != 4)
-        .map((item) => ({
-          ...item,
-          parentId: item.parentId || 0,
-        }))
-      user.permission = userRoutes.reduce((acc, cur) => {
-        if (cur.permission) {
-          return acc.concat(cur.permission)
-        } else {
-          return acc
-        }
-      }, [] as string[])
-    } else {
-      ctx.body = formatResponse(null, '获取失败', 500)
+    if (id === 1) {
+      user.permission = ['*:*:*']
+      const routes = await menuService.getAdminMenus()
+      user.routes = routes
+      ctx.body = formatResponse(user, '获取成功')
       return
+    } else {
+      const userRouteRes = await adminUserService.getAdminUserRoutes(id)
+      if (userRouteRes) {
+        const userRoutes =
+          userRouteRes?.role?.menuOnRole.map((item) => {
+            return item.menu
+          }) || []
+        user.routes = userRoutes
+          .filter((item) => item.type != 4)
+          .map((item) => ({
+            ...item,
+            parentId: item.parentId || 0,
+          }))
+        user.permission = userRoutes.reduce((acc, cur) => {
+          if (cur.permission) {
+            return acc.concat(cur.permission)
+          } else {
+            return acc
+          }
+        }, [] as string[])
+      } else {
+        ctx.body = formatResponse(null, '获取失败', 500)
+        return
+      }
     }
+
     ctx.body = formatResponse(user, '获取成功')
   } catch (error) {
     ctx.body = formatResponse(error, '获取失败', 500)

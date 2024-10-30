@@ -322,6 +322,12 @@ class AdminUserService {
           role: {
             select: {
               menuOnRole: {
+                where: {
+                  menu: {
+                    status: true,
+                    deletedFlag: false,
+                  },
+                },
                 select: {
                   menu: {
                     select: {
