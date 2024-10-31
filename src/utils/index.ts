@@ -48,7 +48,7 @@ export interface sPageResponse<T> {
 }
 
 export const formatPageResponse = <T = any>(
-  list: any[],
+  list: T[],
   page: number,
   pageSize: number,
   total: number = 0

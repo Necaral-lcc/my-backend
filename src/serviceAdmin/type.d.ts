@@ -7,4 +7,5 @@ export interface PageParams {
   pageSize: number
   orderBy?: 'asc' | 'desc'
   order?: string
+  [key: string]: any
 }

@@ -53,8 +53,8 @@ export const createRole = async (ctx: Context) => {
  */
 export const getRoles = async (ctx: Context) => {
   try {
-    const p = await PageService.isPage(ctx)
-    const { page, pageSize } = p
+    const pager = await PageService.isPage(ctx)
+    const { page, pageSize } = pager
     const roles = await roleService.getRoles({
       page: Number(page),
       pageSize: Number(pageSize),

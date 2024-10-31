@@ -15,9 +15,11 @@ export const authPermission =
   (per: string) => async (ctx: Koa.Context, next: Koa.Next) => {
     const { id } = ctx.state.user as sJWT
     if (id === 1) {
+      // 管理员拥有所有权限,任何请求都可以访问
       await next()
       return
     }
+    // 获取用户权限，判断是否有权限
     const userPermission = await AdminUserService.getAdminUserPermission(
       id,
       per
@@ -26,6 +28,6 @@ export const authPermission =
       await next()
       return
     } else {
-      ctx.body = formatResponse(null, '没有权限', 403)
+      ctx.body = formatResponse(ctx.request.url, '没有权限', 403)
     }
   }

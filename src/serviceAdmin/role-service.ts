@@ -10,196 +10,154 @@ import { DefaultArgs } from '@prisma/client/runtime/library'
 const prisma = new PrismaClient()
 
 class RoleService {
-  create(data: Prisma.RoleCreateInput & { menuIds: number[] }) {
+  async create(data: Prisma.RoleCreateInput & { menuIds: number[] }) {
     const { name, menuIds } = data
-    return new Promise((resolve, reject) => {
-      const role = prisma.role.create({
-        data: {
-          name,
-          menuOnRole: {
-            createMany: {
-              data: menuIds.map((id) => ({ menuId: id })),
-            },
-          },
-        },
-        select: {
-          id: true,
-          name: true,
-          createdAt: true,
-          updatedAt: true,
-          menuOnRole: {
-            select: {
-              menuId: true,
-              menu: {
-                select: {
-                  name: true,
-                },
-              },
-            },
-          },
-        },
-      })
-      resolve(role)
-    })
-  }
-
-  getById(id: number): Promise<
-    Prisma.Prisma__RoleClient<
-      {
-        name: string
-        id: number
+    const role = prisma.role.create({
+      data: {
+        name,
         menuOnRole: {
-          menuId: number
-          menu: {
-            name: string
-          }
-        }[]
-      } | null,
-      null,
-      DefaultArgs
-    >
-  > {
-    return new Promise((resolve, reject) => {
-      const role = prisma.role.findUnique({
-        where: { id },
-        select: {
-          id: true,
-          name: true,
-          menuOnRole: {
-            where: {
-              menu: {
-                status: true,
-              },
-            },
-            select: {
-              menuId: true,
-              menu: {
-                select: {
-                  name: true,
-                },
-              },
-            },
+          createMany: {
+            data: menuIds.map((id) => ({ menuId: id })),
           },
         },
-      })
-      resolve(role)
-    })
-  }
-
-  getRoles({ page, pageSize }: PageParams): Promise<
-    Prisma.PrismaPromise<
-      {
-        name: string
-        id: number
-        createdAt: Date
-        updatedAt: Date
+      },
+      select: {
+        id: true,
+        name: true,
+        createdAt: true,
+        updatedAt: true,
         menuOnRole: {
-          menuId: number
-          menu: {
-            name: string
-          }
-        }[]
-      }[]
-    >
-  > {
-    return new Promise((resolve, reject) => {
-      const skip = (page - 1) * pageSize
-      const roles = prisma.role.findMany({
-        skip,
-        take: pageSize,
-        select: {
-          id: true,
-          name: true,
-          createdAt: true,
-          updatedAt: true,
-          menuOnRole: {
-            where: {
-              menu: {
-                status: true,
-              },
-            },
-            select: {
-              menuId: true,
-              menu: {
-                select: {
-                  name: true,
-                },
+          select: {
+            menuId: true,
+            menu: {
+              select: {
+                name: true,
               },
             },
           },
         },
-      })
-      resolve(roles)
+      },
     })
+    return role
   }
 
-  update(id: number, data: Prisma.RoleUpdateInput & { menuIds: number[] }) {
+  async getById(id: number) {
+    const role = prisma.role.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        name: true,
+        menuOnRole: {
+          where: {
+            menu: {
+              status: true,
+            },
+          },
+          select: {
+            menuId: true,
+            menu: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+      },
+    })
+    return role
+  }
+
+  async getRoles({ page, pageSize }: PageParams) {
+    const skip = (page - 1) * pageSize
+    const roles = prisma.role.findMany({
+      skip,
+      take: pageSize,
+      select: {
+        id: true,
+        name: true,
+        createdAt: true,
+        updatedAt: true,
+        menuOnRole: {
+          where: {
+            menu: {
+              status: true,
+            },
+          },
+          select: {
+            menuId: true,
+            menu: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+      },
+    })
+    return roles
+  }
+
+  async update(
+    id: number,
+    data: Prisma.RoleUpdateInput & { menuIds: number[] }
+  ) {
     const { name, menuIds } = data
-    return new Promise((resolve, reject) => {
-      const role = prisma.role.update({
-        where: { id },
-        data: {
-          name,
-          menuOnRole: {
-            deleteMany: {},
-            createMany: {
-              data: menuIds.map((id) => ({ menuId: id })),
-            },
+    const role = await prisma.role.update({
+      where: { id },
+      data: {
+        name,
+        menuOnRole: {
+          deleteMany: {},
+          createMany: {
+            data: menuIds.map((id) => ({ menuId: id })),
           },
         },
-        select: {
-          id: true,
-          name: true,
-          createdAt: true,
-          updatedAt: true,
-          menuOnRole: {
-            select: {
-              menuId: true,
-              menu: {
-                select: {
-                  id: true,
-                },
+      },
+      select: {
+        id: true,
+        name: true,
+        createdAt: true,
+        updatedAt: true,
+        menuOnRole: {
+          select: {
+            menuId: true,
+            menu: {
+              select: {
+                id: true,
               },
             },
           },
         },
-      })
-      resolve(role)
+      },
     })
+    return role
   }
 
-  delete(id: number) {
-    return new Promise((resolve, reject) => {
-      const role = prisma.role.update({
-        where: { id },
-        data: {
-          deletedFlag: true,
-        },
-      })
-      resolve(role)
+  async delete(id: number) {
+    const role = await prisma.role.update({
+      where: { id },
+      data: {
+        deletedFlag: true,
+      },
+      select: {
+        id: true,
+        name: true,
+      },
     })
+    return role
   }
 
-  getRoleOptions(): Promise<
-    Prisma.PrismaPromise<
-      {
-        id: number
-        name: string
-      }[]
-    >
-  > {
-    return new Promise((resolve, reject) => {
-      const roles = prisma.role.findMany({
-        where: {
-          deletedFlag: false,
-        },
-        select: {
-          id: true,
-          name: true,
-        },
-      })
-      resolve(roles)
+  async getRoleOptions() {
+    const roles = await prisma.role.findMany({
+      where: {
+        deletedFlag: false,
+      },
+      select: {
+        id: true,
+        name: true,
+      },
     })
+    return roles
   }
 }
 

@@ -16,29 +16,27 @@ import { listToTree } from '@/utils/tool'
 export const createMenu = async (ctx: Context) => {
   const {
     name,
+    path,
+    parentId,
     title,
     icon,
-    path,
     type,
     component,
     redirect,
     status,
-    parentId,
     keepAlive,
     needLogin,
     link,
     permission,
-  } = ctx.request.body as Prisma.MenuCreateInput & { parentId: number }
+  } = ctx.request.body as Omit<Prisma.MenuCreateInput, 'parent'> & {
+    parentId: number
+  }
 
   if (name === undefined) {
     ctx.body = formatResponse(null, '请输入菜单名称')
     return
   }
 
-  if (path === undefined) {
-    ctx.body = formatResponse(null, '请输入菜单路径')
-    return
-  }
   let parent_id = parentId == 0 ? null : parentId
   try {
     const menu = await menuService.createMenu(
@@ -119,29 +117,35 @@ export const getMenuOptions = async (ctx: Context) => {
  */
 export const updateMenu = async (ctx: Context) => {
   const { id } = ctx.params
-  if (isNumber(id) && Number(id) > 0) {
-    const menuExists = await menuService.getMenuById(Number(id))
-    if (!menuExists) {
-      ctx.body = formatResponse(null, '菜单不存在', 500)
-      return
-    }
-    const {
-      name,
-      title,
-      icon,
-      path,
-      type,
-      component,
-      redirect,
-      status,
-      parentId,
-      keepAlive,
-      needLogin,
-      link,
-      permission,
-    } = ctx.request.body as Prisma.MenuCreateInput & { parentId: number }
-    let parent_id = parentId == 0 ? null : parentId
-    try {
+  const {
+    name,
+    title,
+    icon,
+    path,
+    type,
+    component,
+    redirect,
+    status,
+    parentId,
+    keepAlive,
+    needLogin,
+    link,
+    permission,
+  } = ctx.request.body as Omit<Prisma.MenuCreateInput, 'parent'> & {
+    parentId: number
+  }
+  try {
+    if (isNumber(id) && Number(id) > 0) {
+      if (!name) {
+        ctx.body = formatResponse(null, '请输入菜单名称')
+        return
+      }
+      const menuExists = await menuService.getMenuById(Number(id))
+      if (!menuExists) {
+        ctx.body = formatResponse(null, '菜单不存在', 500)
+        return
+      }
+      let parent_id = parentId == 0 ? null : parentId
       const menu = await menuService.updateMenu(
         {
           name,
@@ -165,9 +169,9 @@ export const updateMenu = async (ctx: Context) => {
       } else {
         ctx.body = formatResponse(null, '菜单更新失败', 500)
       }
-    } catch (e) {
-      ctx.body = formatResponse(e, '菜单更新失败', 500)
     }
+  } catch (e) {
+    ctx.body = formatResponse(e, '菜单更新失败', 500)
   }
 }
 

@@ -9,153 +9,135 @@ import { PageParams } from './type'
 const prisma = new PrismaClient()
 
 class UserService {
-  login(email: string, password: string) {
-    return new Promise((resolve) => {
-      const user = prisma.user.findUnique({
-        where: {
-          email,
-          password,
-          deletedFlag: false,
-        },
-        select: {
-          id: true,
-          email: true,
-          name: true,
-        },
-      })
-      resolve(user)
+  async login(email: string, password: string) {
+    const user = await prisma.user.findUnique({
+      where: {
+        email,
+        password,
+        deletedFlag: false,
+      },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+      },
     })
+    return user
   }
 
-  get(id: number) {
-    return new Promise((resolve, reject) => {
-      const user = prisma.user.findUnique({
-        where: {
-          id,
-          deletedFlag: false,
-        },
-        select: {
-          id: true,
-          email: true,
-          name: true,
-          age: true,
-          sex: true,
-          address: true,
-          phone: true,
-        },
-      })
-      resolve(user)
+  async get(id: number) {
+    const user = await prisma.user.findUnique({
+      where: {
+        id,
+        deletedFlag: false,
+      },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        age: true,
+        sex: true,
+        address: true,
+        phone: true,
+      },
     })
+    return user
   }
 
-  getByEmail(email: string) {
-    return new Promise((resolve, reject) => {
-      const user = prisma.user.findUnique({
-        where: {
-          email,
-          deletedFlag: false,
-        },
-      })
-      resolve(user)
+  async getByEmail(email: string) {
+    const user = prisma.user.findUnique({
+      where: {
+        email,
+        deletedFlag: false,
+      },
     })
+    return user
   }
 
-  getByEmailDeleted(email: string) {
-    return new Promise((resolve, reject) => {
-      const user = prisma.user.findUnique({
-        where: {
-          email,
-          deletedFlag: true,
-        },
-      })
-      resolve(user)
+  async getByEmailDeleted(email: string) {
+    const user = prisma.user.findUnique({
+      where: {
+        email,
+        deletedFlag: true,
+      },
     })
+    return user
   }
 
-  create(email: string, password: string) {
-    return new Promise((resolve, reject) => {
-      const user = prisma.user.create({
-        data: {
-          email,
-          password,
-        },
+  async create(email: string, password: string) {
+    const user = await prisma.user.create({
+      data: {
+        email,
+        password,
+      },
 
-        select: {
-          id: true,
-          email: true,
-          createdAt: true,
-        },
-      })
-      resolve(user)
+      select: {
+        id: true,
+        email: true,
+        createdAt: true,
+      },
     })
+    return user
   }
 
-  restore(email: string, password: string) {
-    return new Promise((resolve, reject) => {
-      const user = prisma.user.update({
-        where: {
-          email,
-          password,
-          deletedFlag: true,
-        },
-        data: {
-          deletedFlag: false,
-          password,
-        },
-        select: {
-          id: true,
-          email: true,
-        },
-      })
-      resolve(user)
+  async restore(email: string, password: string) {
+    const user = await prisma.user.update({
+      where: {
+        email,
+        password,
+        deletedFlag: true,
+      },
+      data: {
+        deletedFlag: false,
+        password,
+      },
+      select: {
+        id: true,
+        email: true,
+      },
     })
+    return user
   }
 
-  update(
+  async update(
     id: number,
     { name, age, sex, address, phone, password }: Prisma.UserUpdateInput
   ) {
-    return new Promise((resolve, reject) => {
-      const user = prisma.user.update({
-        where: {
-          id,
-        },
-        data: {
-          name,
-          age,
-          sex,
-          address,
-          phone,
-          password,
-        },
-      })
-      resolve(user)
+    const user = await prisma.user.update({
+      where: {
+        id,
+      },
+      data: {
+        name,
+        age,
+        sex,
+        address,
+        phone,
+        password,
+      },
     })
+    return user
   }
 
-  delete(id: number) {
-    return new Promise((resolve, reject) => {
-      const user = prisma.user.delete({
-        where: {
-          id,
-        },
-      })
-      resolve(user)
+  async delete(id: number) {
+    const user = await prisma.user.delete({
+      where: {
+        id,
+      },
     })
+    return user
   }
 
-  deleteSelf(id: number) {
-    return new Promise((resolve, reject) => {
-      const user = prisma.user.update({
-        where: {
-          id,
-        },
-        data: {
-          deletedFlag: true,
-        },
-      })
-      resolve(user)
+  async deleteSelf(id: number) {
+    const user = await prisma.user.update({
+      where: {
+        id,
+      },
+      data: {
+        deletedFlag: true,
+      },
     })
+    return user
   }
 }
 
