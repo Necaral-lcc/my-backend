@@ -8,12 +8,13 @@ model file {
   adminUserId Int?
   adminUser   AdminUser?    @relation(fields: [adminUserId], references: [id])
   uploadBy    FileUploadBy?
-  hash        String
+  hash        String        @unique
   size        Int
-  mimetype    String
-  extension   String
+  mimetype    String?
+  extension   String?
 }
 
+/// Enums  USER 0, ADMIN 1
 enum FileUploadBy {
   USER
   ADMIN
