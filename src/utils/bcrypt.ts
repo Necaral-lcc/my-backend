@@ -13,3 +13,9 @@ export const comparePassword = async (
 ): Promise<boolean> => {
   return await bcrypt.compare(password, hash)
 }
+
+export const hashFile = async (file: Buffer): Promise<string> => {
+  const salt = await bcrypt.genSalt(saltRounds)
+  const hash = await bcrypt.hash(file.toString('base64'), salt)
+  return hash
+}
