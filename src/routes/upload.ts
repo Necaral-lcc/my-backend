@@ -31,7 +31,6 @@ const uploadFiles = async (ctx: Context) => {
 }
 
 const uploadFile = async (ctx: Context) => {
-  console.log('ctx.file', ctx.file)
   const res = await uploadPromise(ctx.file)
   if (res) {
     ctx.body = formatResponse(res, '上传成功')

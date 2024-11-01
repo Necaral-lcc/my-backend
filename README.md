@@ -1,5 +1,11 @@
+# server-koa-Prisma
+
+## ...wait
+
+
 ```
 pnpm install
 
-pnpm run dev
+pnpm run start
 ```
+

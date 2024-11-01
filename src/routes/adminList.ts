@@ -26,6 +26,8 @@ import { authPermission } from '@/middleware/permission'
 import type { IRoute } from './index'
 import * as jwt from 'koa-jwt'
 import { PORT, ADMIN_SECRET_KEY, APP_SECRET_KEY, TOKEN_KEY } from '@/config'
+import { rateLimit } from '@/middleware/rateLimit'
+import { refreshToken } from '@/middleware/token'
 
 const list: IRoute[] = [
   {
@@ -38,6 +40,8 @@ const list: IRoute[] = [
       }).unless({
         path: [/^\/admin-api\/login/, /^\/admin-api\/register/],
       }),
+      refreshToken(),
+      rateLimit(),
     ],
     routes: [
       {

@@ -14,6 +14,7 @@ import { formatResponse } from '@/utils'
 export const authPermission =
   (per: string) => async (ctx: Koa.Context, next: Koa.Next) => {
     const { id } = ctx.state.user as sJWT
+    // 管理员拥有所有权限
     if (id === 1) {
       // 管理员拥有所有权限,任何请求都可以访问
       await next()

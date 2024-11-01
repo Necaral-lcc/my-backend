@@ -15,6 +15,10 @@ class PageService {
         ctx.body = formatResponse(null, '请输入正确的每页条数')
         reject('请输入正确的每页条数')
       }
+      if (Number(pageSize) > 10000) {
+        ctx.body = formatResponse(null, '每页条数不能超过10000')
+        reject('每页条数不能超过10000')
+      }
       resolve({ page: Number(page), pageSize: Number(pageSize), ...other })
     })
   }

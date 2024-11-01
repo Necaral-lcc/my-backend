@@ -5,6 +5,7 @@ import { Context } from 'koa'
 import { isEmail, isPassword, formatResponse } from '@/utils'
 import * as jwt from 'jsonwebtoken'
 import { ADMIN_SECRET_KEY, TOKEN_KEY, JWT_EXPIRE_TIME } from '@/config'
+import { createToken } from '@/utils/token'
 import adminUserService, {
   sAdminUserCreateParams,
 } from '@/serviceAdmin/adminUser-service'
@@ -86,13 +87,7 @@ export const loginAdminUser = async (ctx: Context) => {
       ctx.body = formatResponse(null, '用户名或密码错误', 400)
       return
     }
-    const token = jwt.sign(
-      { id: user.id, email: user.email },
-      ADMIN_SECRET_KEY,
-      {
-        expiresIn: JWT_EXPIRE_TIME,
-      }
-    )
+    const token = createToken({ id: user.id, email: user.email })
     ctx.response.set(TOKEN_KEY, token)
     ctx.body = formatResponse(null, '登录成功')
   } catch (error) {
@@ -105,7 +100,6 @@ export const loginAdminUser = async (ctx: Context) => {
  * @returns {Promise<void>}
  */
 export const getAdminUsers = async (ctx: Context) => {
-  console.log('getAdminUsers', ctx.request.query)
   try {
     const pager = await PageService.isPage(ctx)
     const { page, pageSize, name, email } = pager
@@ -258,8 +252,6 @@ export const deleteAdminUser = async (ctx: Context) => {
  */
 export const getAdminUserInfo = async (ctx: Context) => {
   const { id } = ctx.state.user as sJWT
-  console.log('ctx.state', ctx.state)
-
   const user: Partial<sAdminUserInfo> = {}
   try {
     const adminUser = await adminUserService.getAdminUserInfo(id)

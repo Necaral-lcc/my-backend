@@ -6,7 +6,7 @@ import userService from '@/serviceAdmin/user-service'
 import { Prisma } from '@prisma/client'
 import { isEmail, isPassword, formatResponse } from '@/utils'
 import * as jwt from 'jsonwebtoken'
-import { SECRET_KEY, TOKEN_KEY, JWT_EXPIRE_TIME } from '@/config'
+import { TOKEN_KEY, JWT_EXPIRE_TIME } from '@/config'
 
 /**
  * 返回指定用户信息
@@ -64,7 +64,6 @@ export const createUser = async (ctx: Context) => {
     return
   }
   const res = await userService.create(email, password)
-  console.log('createUser', res)
   ctx.response.type = 'application/json'
   ctx.body = formatResponse(res, '创建成功', 200)
 }
@@ -99,28 +98,6 @@ export const deleteUser = async (ctx: Context) => {
     ctx.body = formatResponse(null, '删除成功', 200)
   } else {
     ctx.body = formatResponse(null, 'id非法', 400)
-  }
-}
-
-export const login = async (ctx: Context) => {
-  const { email, password } = ctx.request.body as {
-    email: string
-    password: string
-  }
-  if (!email) ctx.body = formatResponse(null, '邮箱不能为空', 400)
-  if (!isEmail(email)) ctx.body = formatResponse(null, '邮箱格式不正确', 400)
-  if (!password) ctx.body = formatResponse(null, '密码不能为空', 400)
-  const res = await userService.login(email, password)
-
-  if (res) {
-    const { id, email } = res as { id: number; email: string }
-    const token = jwt.sign({ id, email }, SECRET_KEY, {
-      expiresIn: JWT_EXPIRE_TIME,
-    })
-    ctx.response.set(TOKEN_KEY, token)
-    ctx.body = formatResponse(res, '登录成功', 200)
-  } else {
-    ctx.body = formatResponse(null, '用户名或密码错误', 401)
   }
 }
 
