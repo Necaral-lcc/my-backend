@@ -3,6 +3,7 @@ import * as multer from '@koa/multer'
 import * as fs from 'fs'
 import { formatResponse } from '@/utils'
 import * as path from 'path'
+import type { IRoute } from '.'
 
 const upload = multer()
 
@@ -55,7 +56,7 @@ const uploadPromise = (file: multer.File) => {
   })
 }
 
-export default [
+const uploadList: IRoute[] = [
   {
     name: 'upload-multiple',
     type: 'post',
@@ -71,3 +72,5 @@ export default [
     action: uploadFile,
   },
 ]
+
+export default uploadList

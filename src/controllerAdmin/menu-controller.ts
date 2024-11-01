@@ -6,7 +6,7 @@ import menuService from '@/serviceAdmin/menu-service'
 import { Prisma } from '@prisma/client'
 import { isEmail, isPassword, formatResponse, isNumber } from '@/utils'
 import * as jwt from 'jsonwebtoken'
-import { SECRET_KEY, TOKEN_KEY, JWT_EXPIRE_TIME } from '@/config'
+import { TOKEN_KEY, JWT_EXPIRE_TIME } from '@/config'
 import { listToTree } from '@/utils/tool'
 
 /**

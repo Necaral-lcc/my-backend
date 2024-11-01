@@ -4,7 +4,7 @@
 import { Context } from 'koa'
 import { isEmail, isPassword, formatResponse } from '@/utils'
 import * as jwt from 'jsonwebtoken'
-import { SECRET_KEY, TOKEN_KEY, JWT_EXPIRE_TIME } from '@/config'
+import { ADMIN_SECRET_KEY, TOKEN_KEY, JWT_EXPIRE_TIME } from '@/config'
 import adminUserService, {
   sAdminUserCreateParams,
 } from '@/serviceAdmin/adminUser-service'
@@ -13,6 +13,7 @@ import { sJWT } from '@/types'
 import { sAdminUserInfo } from './type'
 import menuService from '@/serviceAdmin/menu-service'
 import PageService from '@/servicePublic/page-service'
+import { listToTree } from '@/utils/tool'
 
 /**
  * 管理员创建
@@ -85,9 +86,13 @@ export const loginAdminUser = async (ctx: Context) => {
       ctx.body = formatResponse(null, '用户名或密码错误', 400)
       return
     }
-    const token = jwt.sign({ id: user.id, email: user.email }, SECRET_KEY, {
-      expiresIn: JWT_EXPIRE_TIME,
-    })
+    const token = jwt.sign(
+      { id: user.id, email: user.email },
+      ADMIN_SECRET_KEY,
+      {
+        expiresIn: JWT_EXPIRE_TIME,
+      }
+    )
     ctx.response.set(TOKEN_KEY, token)
     ctx.body = formatResponse(null, '登录成功')
   } catch (error) {
@@ -100,6 +105,7 @@ export const loginAdminUser = async (ctx: Context) => {
  * @returns {Promise<void>}
  */
 export const getAdminUsers = async (ctx: Context) => {
+  console.log('getAdminUsers', ctx.request.query)
   try {
     const pager = await PageService.isPage(ctx)
     const { page, pageSize, name, email } = pager
@@ -252,6 +258,8 @@ export const deleteAdminUser = async (ctx: Context) => {
  */
 export const getAdminUserInfo = async (ctx: Context) => {
   const { id } = ctx.state.user as sJWT
+  console.log('ctx.state', ctx.state)
+
   const user: Partial<sAdminUserInfo> = {}
   try {
     const adminUser = await adminUserService.getAdminUserInfo(id)
@@ -266,10 +274,13 @@ export const getAdminUserInfo = async (ctx: Context) => {
       user.permission = ['*:*:*']
       // 超级管理员拥有所有菜单
       const routes = await menuService.getAdminMenus()
-      user.routes = routes.map((route) => ({
-        ...route,
-        parentId: route.parentId || 0,
-      })) // 父级菜单id为null的设为0
+      user.routes = listToTree(
+        routes.map((route) => ({
+          ...route,
+          parentId: route.parentId || 0,
+        })),
+        0
+      ) // 父级菜单id为null的设为0
       ctx.body = formatResponse(user, '获取成功')
       return
     } else {
@@ -280,12 +291,15 @@ export const getAdminUserInfo = async (ctx: Context) => {
           userRouteRes?.role?.menuOnRole.map((item) => {
             return item.menu
           }) || [] // 角色拥有的菜单
-        user.routes = userRoutes
-          .filter((item) => item.type != 4) // 过滤掉按钮
-          .map((item) => ({
-            ...item,
-            parentId: item.parentId || 0,
-          })) // 父级菜单id为null的设为0
+        user.routes = listToTree(
+          userRoutes
+            .filter((item) => item.type != 4) // 过滤掉按钮
+            .map((item) => ({
+              ...item,
+              parentId: item.parentId || 0,
+            })),
+          0
+        ) // 父级菜单id为null的设为0
         user.permission = userRoutes.reduce((acc, cur) => {
           if (cur.permission) {
             return acc.concat(cur.permission)

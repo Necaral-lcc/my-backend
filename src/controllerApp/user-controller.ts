@@ -6,7 +6,7 @@ import UserService from '@/serviceApp/user-service'
 import { Prisma } from '@prisma/client'
 import { isEmail, isPassword, formatResponse, isNumber } from '@/utils'
 import * as jwt from 'jsonwebtoken'
-import { SECRET_KEY, TOKEN_KEY, JWT_EXPIRE_TIME } from '@/config'
+import { APP_SECRET_KEY, TOKEN_KEY, JWT_EXPIRE_TIME } from '@/config'
 import type { sJWT } from '@/types'
 
 /**
@@ -63,7 +63,7 @@ export const login = async (ctx: Context) => {
 
     if (res) {
       const { id, email } = res as { id: number; email: string }
-      const token = jwt.sign({ id, email }, SECRET_KEY, {
+      const token = jwt.sign({ id, email }, APP_SECRET_KEY, {
         expiresIn: JWT_EXPIRE_TIME,
       })
       ctx.response.set(TOKEN_KEY, token)

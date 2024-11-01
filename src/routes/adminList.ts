@@ -23,12 +23,22 @@ import {
   getRoleOptions,
 } from '@/controllerAdmin/role-controller'
 import { authPermission } from '@/middleware/permission'
-import { IRoute } from './index'
+import type { IRoute } from './index'
+import * as jwt from 'koa-jwt'
+import { PORT, ADMIN_SECRET_KEY, APP_SECRET_KEY, TOKEN_KEY } from '@/config'
 
 const list: IRoute[] = [
   {
     name: 'admin-api',
     path: '/admin-api',
+    middleware: [
+      jwt({
+        secret: ADMIN_SECRET_KEY,
+        key: 'user',
+      }).unless({
+        path: [/^\/admin-api\/login/, /^\/admin-api\/register/],
+      }),
+    ],
     routes: [
       {
         name: 'system',

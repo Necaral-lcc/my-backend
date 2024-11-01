@@ -7,7 +7,7 @@ import articleService from '@/serviceApp/article-service'
 import { Prisma } from '@prisma/client'
 import { isEmail, isPassword, formatResponse } from '@/utils'
 import * as jwt from 'jsonwebtoken'
-import { SECRET_KEY, TOKEN_KEY, JWT_EXPIRE_TIME } from '@/config'
+import { TOKEN_KEY, JWT_EXPIRE_TIME } from '@/config'
 import * as dayjs from 'dayjs'
 
 /**

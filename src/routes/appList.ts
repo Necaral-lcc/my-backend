@@ -7,11 +7,23 @@ import {
   updateSelf,
 } from '@/controllerApp/user-controller'
 import { publishArticle } from '@/controllerApp//article-controller'
+import type { IRoute } from './index'
+import * as jwt from 'koa-jwt'
+import { ADMIN_SECRET_KEY, APP_SECRET_KEY, TOKEN_KEY } from '@/config'
 
-export default [
+const appList: IRoute[] = [
   {
     name: 'app-api',
     path: '/app-api',
+    middleware: [
+      jwt({
+        secret: [APP_SECRET_KEY],
+        key: 'user',
+        tokenKey: TOKEN_KEY,
+      }).unless({
+        path: [/^\/app-api\/login/, /^\/app-api\/register/],
+      }),
+    ],
     routes: [
       {
         name: 'user',
@@ -40,3 +52,5 @@ export default [
     ],
   },
 ]
+
+export default appList
