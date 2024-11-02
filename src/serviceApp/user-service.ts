@@ -1,12 +1,11 @@
 import { Prisma, PrismaClient } from '@prisma/client'
 import { Context } from 'koa'
 import { PageParams } from './type'
+import prisma from '@/prisma'
 
 /**
  * Service用来处理逻辑，返回结果给Controller
  */
-
-const prisma = new PrismaClient()
 
 class UserService {
   async login(email: string, password: string) {

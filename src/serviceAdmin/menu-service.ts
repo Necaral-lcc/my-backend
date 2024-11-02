@@ -3,12 +3,11 @@ import { Context } from 'koa'
 import { PageParams } from '../serviceApp/type'
 import { formatPageResponse, sPageResponse } from '@/utils'
 import { DefaultArgs } from '@prisma/client/runtime/library'
+import prisma from '@/prisma'
 
 /**
  * Service用来处理逻辑，返回结果给Controller
  */
-
-const prisma = new PrismaClient()
 
 const menuSelect: Prisma.MenuSelect = {
   id: true,

@@ -3,12 +3,11 @@ import { Context } from 'koa'
 import { PageParams } from './type'
 import { DefaultArgs } from '@prisma/client/runtime/library'
 import { formatPageResponse } from '@/utils'
+import prisma from '@/prisma'
 
 /**
  * Service用来处理逻辑，返回结果给Controller
  */
-
-const prisma = new PrismaClient()
 
 export interface sAdminUserCreateParams {
   name: string
