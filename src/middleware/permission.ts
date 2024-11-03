@@ -1,7 +1,7 @@
-import { sJWT } from '@/types'
+import { sJWT } from '../types'
 import * as Koa from 'koa'
-import AdminUserService from '@/serviceAdmin/adminUser-service'
-import { formatResponse } from '@/utils'
+import AdminUserService from '../serviceAdmin/adminUser-service'
+import { formatResponse } from '../utils'
 
 /**
  * 权限验证中间件

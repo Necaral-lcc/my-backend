@@ -29,9 +29,7 @@
 
     "outDir": "./dist",
     "baseUrl": ".",
-    "paths": {
-      "@/*": ["src/*"]
-    },
+
     "typeRoots": ["src/types/index.d.ts"]
   },
   "include": ["src/**/*.ts", "src/**/*.d.ts"]

@@ -2,11 +2,11 @@ import * as Koa from 'koa'
 import * as Router from '@koa/router'
 import * as bodyParser from 'koa-bodyparser'
 import * as jwt from 'koa-jwt'
-import { PORT, ADMIN_SECRET_KEY, APP_SECRET_KEY, TOKEN_KEY } from './config'
-import routesAction from '@/routes'
-import { WebSocketService } from '@/websocket/websocket-service'
+import { PORT, WEBSOCKET_PORT } from './config'
+import routesAction from './routes'
+import { WebSocketService } from './websocket/websocket-service'
 import { formatResponse } from './utils'
-import log4js from '@/middleware/log4js'
+import log4js from './middleware/log4js'
 
 const app = new Koa()
 const router = new Router()
@@ -43,6 +43,6 @@ app.use(router.allowedMethods())
 app.listen(PORT)
 
 // 启动websocket服务
-const wss = new WebSocketService(8081, '/ws')
+const wss = new WebSocketService(Number(WEBSOCKET_PORT), '/ws')
 
-console.log(`应用启动成功 端口:${PORT},ws端口:8081`)
+console.log(`应用启动成功 端口:${PORT},ws端口:${WEBSOCKET_PORT}`)

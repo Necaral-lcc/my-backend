@@ -1,7 +1,7 @@
 import type { Context, Middleware } from 'koa'
 import * as multer from '@koa/multer'
 import * as fs from 'fs'
-import { formatResponse } from '@/utils'
+import { formatResponse } from '../utils'
 import * as path from 'path'
 import type { IRoute } from '.'
 

@@ -2,19 +2,19 @@
  * Controller用于接受数据、返回数据给前端
  */
 import { Context } from 'koa'
-import { isEmail, isPassword, formatResponse } from '@/utils'
+import { isEmail, isPassword, formatResponse } from '../utils'
 import * as jwt from 'jsonwebtoken'
-import { ADMIN_SECRET_KEY, TOKEN_KEY, JWT_EXPIRE_TIME } from '@/config'
-import { createToken } from '@/utils/token'
+import { ADMIN_SECRET_KEY, TOKEN_KEY, JWT_EXPIRE_TIME } from '../config'
+import { createToken } from '../utils/token'
 import adminUserService, {
   sAdminUserCreateParams,
-} from '@/serviceAdmin/adminUser-service'
-import { hashPassword, comparePassword } from '@/utils/bcrypt'
-import { sJWT } from '@/types'
+} from '../serviceAdmin/adminUser-service'
+import { hashPassword, comparePassword } from '../utils/bcrypt'
+import { sJWT } from '../types'
 import { sAdminUserInfo } from './type'
-import menuService from '@/serviceAdmin/menu-service'
-import PageService from '@/servicePublic/page-service'
-import { listToTree } from '@/utils/tool'
+import menuService from '../serviceAdmin/menu-service.ts'
+import PageService from '../servicePublic/page-service.ts'
+import { listToTree } from '../utils/tool'
 
 /**
  * 管理员创建

@@ -3,8 +3,7 @@ import {
   type IRateLimiterOptions,
 } from 'rate-limiter-flexible'
 import * as Koa from 'koa'
-import { sJWT } from '@/types'
-import { formatResponse } from '@/utils'
+import { formatResponse } from '../utils'
 
 const options: IRateLimiterOptions = {
   points: 10, // 6 points

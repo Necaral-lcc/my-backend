@@ -2,7 +2,7 @@
  * Controller用于接受数据、返回数据给前端
  */
 import { Context } from 'koa'
-import roleService from '@/serviceAdmin/role-service'
+import roleService from '../serviceAdmin/role-service'
 import { Prisma } from '@prisma/client'
 import {
   isEmail,
@@ -10,10 +10,8 @@ import {
   formatResponse,
   isNumber,
   formatPageResponse,
-} from '@/utils'
-import * as jwt from 'jsonwebtoken'
-import { TOKEN_KEY, JWT_EXPIRE_TIME } from '@/config'
-import PageService from '@/servicePublic/page-service'
+} from '../utils'
+import PageService from '../servicePublic/page-service'
 
 /**
  * 创建角色

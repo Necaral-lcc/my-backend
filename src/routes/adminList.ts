@@ -5,7 +5,7 @@ import {
   getMenuOptions,
   updateMenu,
   deleteMenu,
-} from '@/controllerAdmin/menu-controller'
+} from '../controllerAdmin/menu-controller'
 import {
   registerAdminUser,
   loginAdminUser,
@@ -13,7 +13,7 @@ import {
   getAdminUserForm,
   updateAdminUser,
   getAdminUserInfo,
-} from '@/controllerAdmin/adminUser-controller'
+} from '../controllerAdmin/adminUser-controller'
 import {
   createRole,
   getRoles,
@@ -21,13 +21,13 @@ import {
   updateRole,
   deleteRole,
   getRoleOptions,
-} from '@/controllerAdmin/role-controller'
-import { authPermission } from '@/middleware/permission'
+} from '../controllerAdmin/role-controller'
+import { authPermission } from '../middleware/permission'
 import type { IRoute } from './index'
 import * as jwt from 'koa-jwt'
-import { PORT, ADMIN_SECRET_KEY, APP_SECRET_KEY, TOKEN_KEY } from '@/config'
-import { rateLimit } from '@/middleware/rateLimit'
-import { refreshToken } from '@/middleware/token'
+import { PORT, ADMIN_SECRET_KEY, APP_SECRET_KEY, TOKEN_KEY } from '../config'
+import { rateLimit } from '../middleware/rateLimit'
+import { refreshToken } from '../middleware/token'
 
 const list: IRoute[] = [
   {

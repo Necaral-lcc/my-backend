@@ -1,5 +1,5 @@
-import { PageParams } from '@/serviceAdmin/type'
-import { formatResponse } from '@/utils'
+import { PageParams } from '../serviceAdmin/type'
+import { formatResponse } from '../utils'
 import { Context } from 'koa'
 
 class PageService {

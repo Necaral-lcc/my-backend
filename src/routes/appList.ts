@@ -5,11 +5,11 @@ import {
   viewUser,
   deleteSelf,
   updateSelf,
-} from '@/controllerApp/user-controller'
-import { publishArticle } from '@/controllerApp//article-controller'
+} from '../controllerApp/user-controller'
+import { publishArticle } from '../controllerApp//article-controller'
 import type { IRoute } from './index'
 import * as jwt from 'koa-jwt'
-import { ADMIN_SECRET_KEY, APP_SECRET_KEY, TOKEN_KEY } from '@/config'
+import { ADMIN_SECRET_KEY, APP_SECRET_KEY, TOKEN_KEY } from '../config'
 
 const appList: IRoute[] = [
   {

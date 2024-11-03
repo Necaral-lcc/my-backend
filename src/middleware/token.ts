@@ -1,10 +1,9 @@
-import { sJWT } from '@/types'
+import { sJWT } from '../types'
 import * as Koa from 'koa'
-import AdminUserService from '@/serviceAdmin/adminUser-service'
-import { formatResponse } from '@/utils'
+import { formatResponse } from '../utils'
 import * as jwt from 'jsonwebtoken'
-import { ADMIN_SECRET_KEY, TOKEN_KEY, JWT_EXPIRE_TIME } from '@/config'
-import { createToken } from '@/utils/token'
+import { ADMIN_SECRET_KEY, TOKEN_KEY, JWT_EXPIRE_TIME } from '../config'
+import { createToken } from '../utils/token'
 
 /**
  * 延长token过期时间

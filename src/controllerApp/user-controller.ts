@@ -2,12 +2,12 @@
  * Controller用于接受数据、返回数据给前端
  */
 import { Context } from 'koa'
-import UserService from '@/serviceApp/user-service'
+import UserService from '../serviceApp/user-service'
 import { Prisma } from '@prisma/client'
-import { isEmail, isPassword, formatResponse, isNumber } from '@/utils'
+import { isEmail, isPassword, formatResponse, isNumber } from '../utils'
 import * as jwt from 'jsonwebtoken'
-import { APP_SECRET_KEY, TOKEN_KEY, JWT_EXPIRE_TIME } from '@/config'
-import type { sJWT } from '@/types'
+import { APP_SECRET_KEY, TOKEN_KEY, JWT_EXPIRE_TIME } from '../config'
+import type { sJWT } from '../types'
 
 /**
  * 用户注册

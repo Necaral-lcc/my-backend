@@ -2,12 +2,12 @@
  * Controller用于接受数据、返回数据给前端
  */
 import { Context } from 'koa'
-import menuService from '@/serviceAdmin/menu-service'
+import menuService from '../serviceAdmin/menu-service'
 import { Prisma } from '@prisma/client'
-import { isEmail, isPassword, formatResponse, isNumber } from '@/utils'
+import { isEmail, isPassword, formatResponse, isNumber } from '../utils'
 import * as jwt from 'jsonwebtoken'
-import { TOKEN_KEY, JWT_EXPIRE_TIME } from '@/config'
-import { listToTree } from '@/utils/tool'
+import { TOKEN_KEY, JWT_EXPIRE_TIME } from '../config'
+import { listToTree } from '../utils/tool'
 
 /**
  * 用户创建权限菜单
