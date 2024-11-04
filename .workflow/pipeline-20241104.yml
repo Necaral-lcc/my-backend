@@ -9,7 +9,7 @@ triggers:
         - master
     commitMessages:
       include:
-        - '^release:'
+        - ^release:*
 stages:
   - name: stage-bde7c8d1
     displayName: 服务器拉取代码
