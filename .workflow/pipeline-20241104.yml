@@ -1,0 +1,37 @@
+version: '1.0'
+name: pipeline-20241104
+displayName: pipeline-20241104
+triggers:
+  trigger: auto
+  push:
+    branches:
+      precise:
+        - master
+    commitMessages:
+      include:
+        - '^release:'
+stages:
+  - name: stage-bde7c8d1
+    displayName: 服务器拉取代码
+    strategy: naturally
+    trigger: auto
+    executor:
+      - Necaral
+    steps:
+      - step: shell@agent
+        name: execute_shell
+        displayName: Shell 脚本执行
+        hostGroupID:
+          ID: txy-server
+          hostID:
+            - f7129753-7a1e-4709-acc6-637c1098a41c
+        script:
+          - '# 请在此输入您想执行的脚本'
+          - 'cd /usr/app/my-backend && git pull && pnpm i && pnpm run db:push:prod && pnpm run tsc:build '
+          - ''
+          - ''
+        notify: []
+        strategy:
+          retry: '0'
+strategy:
+  blocking: false
