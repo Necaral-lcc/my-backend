@@ -76,12 +76,18 @@ class RoleService {
         name: true,
         createdAt: true,
         updatedAt: true,
+        _count: {
+          select: {
+            menuOnRole: true,
+          },
+        },
         menuOnRole: {
           where: {
             menu: {
               status: true,
             },
           },
+
           select: {
             menuId: true,
             menu: {

@@ -60,11 +60,8 @@ export const getRoles = async (ctx: Context) => {
     if (roles) {
       const list = roles.map((item) => {
         return {
-          id: item.id,
-          name: item.name,
+          ...item,
           menuIds: item.menuOnRole.map((cItem) => cItem.menuId),
-          createdAt: item.createdAt,
-          updatedAt: item.updatedAt,
         }
       })
       ctx.body = formatResponse(

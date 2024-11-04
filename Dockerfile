@@ -32,6 +32,8 @@ RUN --mount=type=bind,source=package.json,target=package.json \
   pnpm install --production=false
 
 
+RUN pnpm run tsc:build
+
 
 # Run the application as a non-root user.
 USER node

@@ -26,7 +26,7 @@ export const TOKEN_KEY = process.env.TOKEN_KEY || 'token'
 /**
  * JWT 过期时间 单位：秒
  */
-export const JWT_EXPIRE_TIME = process.env.JWT_EXPIRE_TIME || 360
+export const JWT_EXPIRE_TIME = process.env.JWT_EXPIRE_TIME || 3600000
 
 console.log('nodeEnv:', nodeEnv)
 console.log('PORT:', PORT)
