@@ -54,6 +54,8 @@ jobs:
             echo $PATH
             export NODE_HOME=/root/.nvm/versions/node/v18.12.0/bin/node # 可使用`whereis node`查询node所在的目录
             export PATH=$PATH:$NODE_HOME/bin # 重新定义node的环境变量（必需，这样才能在后续工作流程中运行 npm install 等指令，否则会报错）
+            echo 'NODE_HOME path'
+            echo $PATH
             npm -v
             pnpm -v
             git -v
