@@ -45,13 +45,22 @@ jobs:
       #     local: '.' # 源路径（工作流）
       #     remote: $SSH_URL2 # 目标路径（服务器）
 
+      - name: Run remote command via SSH
+        uses: D3rHase/ssh-command-action@latest
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          user: ${{ secrets.SSH_USERNAME }}
+          private_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          host_fingerprint: ${{ secrets.SSH_KNOWN_HOST }}
+          command: |
+            echo "hello world"
+
       - name: Executing remote ssh commands
         uses: appleboy/ssh-action@v1.1.0
         with:
           host: ${{ secrets.SSH_HOST }} # 服务器IP（需要在GitHub上自行配置对应的secret）
           username: ${{ secrets.SSH_USERNAME }} # 服务器用户名
-          key: ${{ secrets.SSH_PRIVATE_KEY }} # 私钥
-          fingerprint: ${{ secrets.SSH_KNOWN_HOST }} # 指纹
+          password: ${{ secrets.MY_PASSWORD }} # 服务器密码
           envs: SSH_USERNAME,SSH_URL
           script: |
             cd $SSH_URL && git pull
