@@ -49,7 +49,7 @@ jobs:
           password: ${{ secrets.MY_PASSWORD }} # 服务器密码
           script: |
             cd /usr/app/backend 
-            export NODE_HOME=/root/.nvm/versions/node/v12.19.0  # 可使用`whereis node`查询node所在的目录
+            export NODE_HOME=whereis node  # 可使用`whereis node`查询node所在的目录
             export PATH=$PATH:$NODE_HOME/bin # 重新定义node的环境变量（必需，这样才能在后续工作流程中运行 npm install 等指令，否则会报错）
             npm -v
             pnpm -v
