@@ -27,7 +27,7 @@ jobs:
       # 目标路径
       SSH_URL: '/usr/app/my-backend'
       # 目标路径2
-      SSH_URL2: '/usr/app/backend'
+      SSH_URL2: '/usr/app/my-backend'
 
     steps:
       # 创建ssh目录, 并启动ssh代理
@@ -35,15 +35,32 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Deploy
-        uses: cross-the-world/scp-pipeline@master
+      # - name: Deploy
+      #   uses: cross-the-world/scp-pipeline@master
+      #   with:
+      #     host: ${{ secrets.SSH_HOST }} # 服务器IP（需要在GitHub上自行配置对应的secret）
+      #     user: ${{ secrets.SSH_USERNAME }} # 服务器用户名
+      #     pass: ${{ secrets.MY_PASSWORD }} # 服务器密码
+      #     connect_timeout: 10s
+      #     local: '.' # 源路径（工作流）
+      #     remote: $SSH_URL2 # 目标路径（服务器）
+
+      - name: ssh scp ssh pipelines
+        uses: cross-the-world/ssh-scp-ssh-pipelines@latest
+        env:
+          WELCOME: 'ssh scp ssh pipelines'
+          LASTSSH: 'Doing something after copying'
         with:
-          host: ${{ secrets.SSH_HOST }} # 服务器IP（需要在GitHub上自行配置对应的secret）
-          user: ${{ secrets.SSH_USERNAME }} # 服务器用户名
-          pass: ${{ secrets.MY_PASSWORD }} # 服务器密码
+          host: ${{ secrets.SSH_HOST }}
+          user: ${{ secrets.SSH_USERNAME }}
+          pass: ${{ secrets.MY_PASSWORD }}
           connect_timeout: 10s
-          local: '.' # 源路径（工作流）
-          remote: $SSH_URL2 # 目标路径（服务器）
+          first_ssh: |
+            echo 'first_ssh path'
+            echo $PATH
+          last_ssh: |
+            echo $LASTSSH && 
+            echo $PATH
 
       - name: Executing remote ssh commands
         uses: appleboy/ssh-action@v1.1.0
