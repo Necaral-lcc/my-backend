@@ -56,7 +56,7 @@ jobs:
             export NODE_NAME=/usr/.nvm/versions/node/v18.12.0/bin/node &&
             export PATH=$PATH:$NODE_NAME/bin &&
             echo "path: $PATH" &&
-            node -v
+            npm -v
 
       - name: Executing remote ssh commands
         uses: appleboy/ssh-action@v1.1.0
