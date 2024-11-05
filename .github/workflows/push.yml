@@ -46,8 +46,8 @@ jobs:
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_HOST }} # 服务器IP（需要在GitHub上自行配置对应的secret）
-          user: ${{ secrets.SSH_USERNAME }} # 服务器用户名
-          pass: ${{ secrets.MY_PASSWORD }} # 服务器密码
+          username: ${{ secrets.SSH_USERNAME }} # 服务器用户名
+          password: ${{ secrets.MY_PASSWORD }} # 服务器密码
           script: |
             cd /home/app/backend # 进入服务器中的端工程所在的目录
             pwd
