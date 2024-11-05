@@ -22,13 +22,12 @@ jobs:
       SSH_HOST: ${{ secrets.SSH_HOST }}
       # 指纹
       SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOST }}
+      # 目标路径
+      SSH_URL: '/usr/app/backend'
+
     steps:
       # 创建ssh目录, 并启动ssh代理
-      - name: setup ssh
-        shell: bash
-        run: |
-          mkdir -p $HOME/.ssh
-
+      # 克隆代码
       - name: Checkout
         uses: actions/checkout@v3
 
@@ -40,7 +39,7 @@ jobs:
           pass: ${{ secrets.MY_PASSWORD }} # 服务器密码
           connect_timeout: 10s
           local: '.' # 源路径（工作流）
-          remote: /usr/app/backend # 目标路径（服务器）
+          remote: $SSH_URL # 目标路径（服务器）
 
       - name: Executing remote ssh commands
         uses: appleboy/ssh-action@master
@@ -49,7 +48,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }} # 服务器用户名
           password: ${{ secrets.MY_PASSWORD }} # 服务器密码
           script: |
-            cd /home/app/backend # 进入服务器中的端工程所在的目录
+            cd $SSH_URL # 进入服务器中的端工程所在的目录
             pwd
             ls -al
             uname -a
