@@ -89,7 +89,7 @@ export const loginAdminUser = async (ctx: Context) => {
     }
     const token = createToken({ id: user.id, email: user.email })
     ctx.response.set(TOKEN_KEY, token)
-    ctx.body = formatResponse(null, '登录成功')
+    ctx.body = formatResponse(token, '登录成功!')
   } catch (error) {
     ctx.body = formatResponse(error, '用户名或密码错误', 400)
   }
