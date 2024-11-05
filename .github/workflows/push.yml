@@ -44,28 +44,26 @@ jobs:
           # 将密钥添加的ssh-agent
           echo "$SSH_PRIVATE_KEY" | ssh-add -
 
+      - name: checkout code
+        uses: actions/checkout@v2
+
       - name: to app
-        shell: bash
         run: |
           cd ~
           cd /usr/app/my-backend
 
       - name: pull code
-        shell: bash
         run: |
           git pull
 
       - name: install dependencies
-        shell: bash
         run: |
           npm install
 
       - name: push prisma schema
-        shell: bash
         run: |
           npx prisma migrate deploy
 
       - name: typescript build
-        shell: bash
         run: |
           npm run tsc:build
