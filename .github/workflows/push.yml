@@ -44,7 +44,7 @@ jobs:
       #     remote: $SSH_URL # 目标路径（服务器）
 
       - name: Executing remote ssh commands
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@v1.1.0
         with:
           host: ${{ secrets.SSH_HOST }} # 服务器IP（需要在GitHub上自行配置对应的secret）
           username: ${{ secrets.SSH_USERNAME }} # 服务器用户名
