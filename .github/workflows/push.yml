@@ -45,22 +45,19 @@ jobs:
       #     local: '.' # 源路径（工作流）
       #     remote: $SSH_URL2 # 目标路径（服务器）
 
-      - name: ssh scp ssh pipelines
-        uses: cross-the-world/ssh-scp-ssh-pipelines@latest
-        env:
-          WELCOME: 'ssh scp ssh pipelines'
-          LASTSSH: 'Doing something after copying'
+      - name: Exec cmd on remote server
+        uses: Comori/ssh@v0.0.1
         with:
           host: ${{ secrets.SSH_HOST }}
-          user: ${{ secrets.SSH_USERNAME }}
-          pass: ${{ secrets.MY_PASSWORD }}
-          connect_timeout: 10s
-          first_ssh: |
-            echo 'first_ssh path'
+          username: ${{ secrets.SSH_USERNAME }}
+          password: ${{ secrets.MY_PASSWORD }}
+          command: |
+            echo 'path'
             echo $PATH
-          last_ssh: |
-            echo $LASTSSH && 
-            echo $PATH
+            echo 'pwd'
+            pwd
+            echo 'ls'
+            ls
 
       - name: Executing remote ssh commands
         uses: appleboy/ssh-action@v1.1.0
