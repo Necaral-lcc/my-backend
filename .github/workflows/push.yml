@@ -49,6 +49,4 @@ jobs:
           password: ${{ secrets.MY_PASSWORD }} # 服务器密码
           script: |
             cd $SSH_URL # 进入服务器中的端工程所在的目录
-            pwd
-            ls -al
-            uname -a
+            pnpm --version # 查看pnpm版本
