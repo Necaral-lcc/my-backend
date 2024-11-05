@@ -52,3 +52,14 @@ jobs:
           envs: SSH_USERNAME,SSH_URL
           script: |
             cd $SSH_URL && git pull
+
+      - name: Multiple commands over multiple hosts with custom SSH config
+        uses: docker://evaneos/ssh-action:0.1.0
+        with:
+          hosts: ${{ secrets.SSH_HOST }}
+          private_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          known_hosts: ${{ secrets.SSH_KNOWN_HOST }}
+          commands: |
+            echo "I can run..."
+            echo $PATH
+            echo "...multiple commands"
