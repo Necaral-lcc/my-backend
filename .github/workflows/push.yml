@@ -45,19 +45,17 @@ jobs:
       #     local: '.' # 源路径（工作流）
       #     remote: $SSH_URL2 # 目标路径（服务器）
 
-      - name: Exec cmd on remote server
-        uses: Comori/ssh@v0.0.1
+      - name: Run remote command via SSH
+        uses: D3rHase/ssh-command-action@latest
         with:
           host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USERNAME }}
-          password: ${{ secrets.MY_PASSWORD }}
+          user: ${{ secrets.SSH_USERNAME }}
+          private_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          host_fingerprint: ${{ secrets.SSH_KNOWN_HOST }}
           command: |
-            echo 'path'
+            echo 'Hello, World!'
             echo $PATH
-            echo 'pwd'
-            pwd
-            echo 'ls'
-            ls
+            ls -al
 
       - name: Executing remote ssh commands
         uses: appleboy/ssh-action@v1.1.0
