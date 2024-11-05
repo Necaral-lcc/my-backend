@@ -53,11 +53,11 @@ jobs:
           private_key: ${{ secrets.SSH_PRIVATE_KEY }}
           host_fingerprint: ${{ secrets.SSH_KNOWN_HOST }}
           command: |
-            echo 'Hello, World!'
-            echo $PATH
-            ls -al
-            node -v
-            npm -v
+            echo 'Hello, World!' |
+            echo $PATH && 
+            ls -al &&
+            node -v &&
+            npm -v &&
 
       - name: Executing remote ssh commands
         uses: appleboy/ssh-action@v1.1.0
