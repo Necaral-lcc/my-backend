@@ -46,7 +46,8 @@ jobs:
         with:
           host: ${{ secrets.SSH_HOST }} # 服务器IP（需要在GitHub上自行配置对应的secret）
           username: ${{ secrets.SSH_USERNAME }} # 服务器用户名
-          password: ${{ secrets.MY_PASSWORD }} # 服务器密码
+          key: ${{ secrets.SSH_PRIVATE_KEY }} # 私钥
+          port: 22 # 端口
           script: |
             ls -al
             cd /usr/app/backend 
