@@ -47,8 +47,25 @@ jobs:
       - name: to app
         shell: bash
         run: |
+          cd ~
           cd /usr/app/my-backend
-          git pull 
-          pnpm install
-          pnpm run db:push:prod
-          pnpm run tsc:build
+
+      - name: pull code
+        shell: bash
+        run: |
+          git pull
+
+      - name: install dependencies
+        shell: bash
+        run: |
+          npm install
+
+      - name: push prisma schema
+        shell: bash
+        run: |
+          npx prisma migrate deploy
+
+      - name: typescript build
+        shell: bash
+        run: |
+          npm run tsc:build
