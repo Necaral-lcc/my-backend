@@ -46,9 +46,9 @@ jobs:
       - name: Executing remote ssh commands
         uses: appleboy/ssh-action@master
         with:
-          host: SSH_HOST # 服务器IP（需要在GitHub上自行配置对应的secret）
-          username: SSH_USERNAME # 服务器用户名
-          password: MY_PASSWORD # 服务器密码
+          host: ${{ secrets.SSH_HOST }} # 服务器IP（需要在GitHub上自行配置对应的secret）
+          username: ${{ secrets.SSH_USERNAME }} # 服务器用户名
+          key: ${{ secrets.SSH_PRIVATE_KEY }} # 私钥
           envs: SSH_USERNAME
           script: |
             echo 'path'
