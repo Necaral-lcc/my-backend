@@ -25,7 +25,7 @@ jobs:
       # 密码
       MY_PASSWORD: ${{ secrets.MY_PASSWORD }}
       # 目标路径
-      SSH_URL: '/usr/app/backend'
+      SSH_URL: '/usr/app/my-backend'
 
     steps:
       # 创建ssh目录, 并启动ssh代理
