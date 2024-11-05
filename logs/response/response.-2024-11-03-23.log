@@ -1,5 +1,0 @@
-[2024-11-03T23:56:40.188] [INFO] resLogger - ------------response start------------response status: 200 
-response result: {"msg":"登录成功","code":200} 
-response all: {"request":{"method":"POST","url":"/admin-api/login","header":{"content-type":"application/json","user-agent":"PostmanRuntime/7.42.0","accept":"*/*","cache-control":"no-cache","postman-token":"5e152127-19fd-42e0-a45e-a1e50cf2c0c1","host":"localhost:3000","accept-encoding":"gzip, deflate, br","connection":"keep-alive","content-length":"56"}},"response":{"status":200,"message":"OK","header":{"retry-after":"1","x-ratelimit-limit":"10","x-ratelimit-remaining":"9","x-ratelimit-reset":"2024/11/3 23:56:41","token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOm51bGwsImlhdCI6MTczMDY0OTQwMCwiZXhwIjoxNzMwNjQ5NDM2fQ.kRFj409PXoFDPaSEuvjmp5kRlbo32NqGhPwFl7q1PO0","content-type":"application/json; charset=utf-8"}},"app":{"subdomainOffset":2,"proxy":false,"env":"development"},"originalUrl":"/admin-api/login","req":"<original node req>","res":"<original node res>","socket":"<original node socket>"} 
-response time: 112 
-
