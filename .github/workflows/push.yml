@@ -22,6 +22,8 @@ jobs:
       SSH_HOST: ${{ secrets.SSH_HOST }}
       # 指纹
       SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOST }}
+      # 密码
+      MY_PASSWORD: ${{ secrets.MY_PASSWORD }}
       # 目标路径
       SSH_URL: '/usr/app/backend'
 
@@ -44,9 +46,9 @@ jobs:
       - name: Executing remote ssh commands
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.SSH_HOST }} # 服务器IP（需要在GitHub上自行配置对应的secret）
-          username: ${{ secrets.SSH_USERNAME }} # 服务器用户名
-          password: ${{ secrets.MY_PASSWORD }} # 服务器密码
+          host: SSH_HOST # 服务器IP（需要在GitHub上自行配置对应的secret）
+          username: SSH_USERNAME # 服务器用户名
+          password: MY_PASSWORD # 服务器密码
           envs: SSH_USERNAME
           script: |
             echo 'path'
