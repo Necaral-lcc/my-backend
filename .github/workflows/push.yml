@@ -48,5 +48,4 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }} # 服务器用户名
           password: ${{ secrets.MY_PASSWORD }} # 服务器密码
           script: |
-            cd /usr/app/backend && ls -al && pwd  
-            uname -a # 进入服务器中的端工程所在的目录
+            cd /usr/app/backend && ls -al && pwd  && nvm ls
