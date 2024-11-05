@@ -51,8 +51,8 @@ jobs:
           ls -al
           uname -a
 
-      - name: checkout code
-        uses: actions/checkout@v2
+      # - name: checkout code
+      #   uses: actions/checkout@v2
 
       - name: test
         run: |
