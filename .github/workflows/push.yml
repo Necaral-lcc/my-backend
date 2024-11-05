@@ -68,8 +68,7 @@ jobs:
           first_ssh: |
             echo 'first_ssh path'
             echo $PATH
-          scp: |
-            '.' => /usr/app/backend
+
           last_ssh: |
             echo $LASTSSH && 
             echo $PATH
