@@ -53,7 +53,7 @@ jobs:
           private_key: ${{ secrets.SSH_PRIVATE_KEY }}
           host_fingerprint: ${{ secrets.SSH_KNOWN_HOST }}
           command: |
-            echo 'Hello, World!' |
+            echo 'Hello, World!' ;
             echo $PATH && 
             ls -al &&
             node -v &&
