@@ -48,19 +48,7 @@ jobs:
         with:
           host: ${{ secrets.SSH_HOST }} # 服务器IP（需要在GitHub上自行配置对应的secret）
           username: ${{ secrets.SSH_USERNAME }} # 服务器用户名
-          key: ${{ secrets.SSH_PRIVATE_KEY }} # 私钥
-          envs: SSH_USERNAME
+          password: ${{ secrets.MY_PASSWORD }} # 服务器密码
+          envs: SSH_USERNAME,SSH_URL
           script: |
-            echo 'path'
-            echo $PATH
-            export NODE_HOME=/$SSH_USERNAME/.nvm/versions/node/v18.12.0/bin/node # 可使用`whereis node`查询node所在的目录
-            export PATH=$PATH:$NODE_HOME/bin # 重新定义node的环境变量（必需，这样才能在后续工作流程中运行 npm install 等指令，否则会报错）
-            cd /$SSH_USERNAME
-            ls -al
-            echo 'NODE_HOME path'
-            echo $PATH
-            whoami
-            echo 'node version'
-            npm -v
-            pnpm -v
-            git -v
+            cd $SSH_URL && git pull
