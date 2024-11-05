@@ -43,6 +43,12 @@ jobs:
           echo "SSH_AGENT_PID=SSH_AGENT_PID" >> $GITHUB_ENV
           # 将密钥添加的ssh-agent
           echo "$SSH_PRIVATE_KEY" | ssh-add -
+          
+      - name: test 1
+        run: |
+          echo "hello, world"
+          pwd
+          ls -al
 
       - name: checkout code
         uses: actions/checkout@v2
