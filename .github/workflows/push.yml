@@ -47,23 +47,29 @@ jobs:
       - name: checkout code
         uses: actions/checkout@v2
 
-      - name: to app
+      - name: test
         run: |
-          cd ~
-          cd /usr/app/my-backend
+          echo "hello, world"
+          pwd
+          ls -al
 
-      - name: pull code
-        run: |
-          git pull
+      # - name: to app
+      #   run: |
+      #     cd ~
+      #     cd /usr/app/my-backend
 
-      - name: install dependencies
-        run: |
-          npm install
+      # - name: pull code
+      #   run: |
+      #     git pull
 
-      - name: push prisma schema
-        run: |
-          npx prisma migrate deploy
+      # - name: install dependencies
+      #   run: |
+      #     npm install
 
-      - name: typescript build
-        run: |
-          npm run tsc:build
+      # - name: push prisma schema
+      #   run: |
+      #     npx prisma migrate deploy
+
+      # - name: typescript build
+      #   run: |
+      #     npm run tsc:build
