@@ -49,4 +49,6 @@ jobs:
           password: ${{ secrets.MY_PASSWORD }} # 服务器密码
           script: |
             cd $SSH_URL # 进入服务器中的端工程所在的目录
+            nvm ls # 查看nvm管理的node版本
+            nvm use 18  
             pnpm --version # 查看pnpm版本
