@@ -28,57 +28,28 @@ jobs:
         shell: bash
         run: |
           mkdir -p $HOME/.ssh
-      # 保存公钥到known_hosts
-      - name: configure ssh public key
-        shell: bash
-        run: echo "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
-      # 保存私钥到ssh-agent
-      - name: setup ssh private key
-        shell: bash
-        run: |
-          # 启动ssh-agent
-          eval $(ssh-agent)
-          # 将进程信息保存到环境变量, 方便后面的程序使用, 如docker
-          echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK" >> $GITHUB_ENV
-          echo "SSH_AGENT_PID=SSH_AGENT_PID" >> $GITHUB_ENV
-          # 将密钥添加的ssh-agent
-          echo "$SSH_PRIVATE_KEY" | ssh-add -
-          
-      - name: test 1
-        run: |
-          echo "hello, world"
-          pwd
-          ls -al
-          uname -a
 
-      # - name: checkout code
-      #   uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v3
 
-      - name: test
-        run: |
-          echo "hello, world"
-          pwd
-          ls -al
-          uname -a
+      - name: Deploy
+        uses: cross-the-world/scp-pipeline@master
+        with:
+          host: ${{ secrets.SSH_HOST }} # 服务器IP（需要在GitHub上自行配置对应的secret）
+          user: ${{ secrets.SSH_USERNAME }} # 服务器用户名
+          pass: ${{ secrets.MY_PASSWORD }} # 服务器密码
+          connect_timeout: 10s
+          local: '.' # 源路径（工作流）
+          remote: /usr/app/backend # 目标路径（服务器）
 
-
-      # - name: to app
-      #   run: |
-      #     cd ~
-      #     cd /usr/app/my-backend
-
-      # - name: pull code
-      #   run: |
-      #     git pull
-
-      # - name: install dependencies
-      #   run: |
-      #     npm install
-
-      # - name: push prisma schema
-      #   run: |
-      #     npx prisma migrate deploy
-
-      # - name: typescript build
-      #   run: |
-      #     npm run tsc:build
+      - name: Executing remote ssh commands
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }} # 服务器IP（需要在GitHub上自行配置对应的secret）
+          user: ${{ secrets.SSH_USERNAME }} # 服务器用户名
+          pass: ${{ secrets.MY_PASSWORD }} # 服务器密码
+          script: |
+            cd /home/app/backend # 进入服务器中的端工程所在的目录
+            pwd
+            ls -al
+            uname -a

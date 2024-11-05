@@ -1,0 +1,83 @@
+# 名字随意
+name: push to my txy server
+# 触发机制, 可以定时, 或其他, 具体可自行百度, 示例为main分支push时触发
+on:
+  push:
+    branches:
+      - main
+# 要执行的计划
+jobs:
+  # 我们只有一个任务, 就是发版, publish可以自己写其它的名字
+  push-to-tencent:
+    # 指定环境, 即创建环境机密时, 给环境的命名. 当然如果你创建的是仓库机密, 则无需下面这行
+    environment: push to my txy server
+    # 指定在Ubuntu机器上运行此工作流
+    runs-on: ubuntu-latest
+    env:
+      # 私钥
+      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      # 用户名
+      SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
+      # 主机地址
+      SSH_HOST: ${{ secrets.SSH_HOST }}
+      # 指纹
+      SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOST }}
+    steps:
+      # 创建ssh目录, 并启动ssh代理
+      - name: setup ssh
+        shell: bash
+        run: |
+          mkdir -p $HOME/.ssh
+      # 保存公钥到known_hosts
+      - name: configure ssh public key
+        shell: bash
+        run: echo "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+      # 保存私钥到ssh-agent
+      - name: setup ssh private key
+        shell: bash
+        run: |
+          # 启动ssh-agent
+          eval $(ssh-agent)
+          # 将进程信息保存到环境变量, 方便后面的程序使用, 如docker
+          echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK" >> $GITHUB_ENV
+          echo "SSH_AGENT_PID=SSH_AGENT_PID" >> $GITHUB_ENV
+          # 将密钥添加的ssh-agent
+          echo "$SSH_PRIVATE_KEY" | ssh-add -
+
+      - name: test 1
+        run: |
+          echo "hello, world"
+          pwd
+          ls -al
+          uname -a
+
+      - name: checkout code
+        uses: actions/checkout@v2
+
+      - name: test
+        run: |
+          echo "hello, world"
+          pwd
+          ls -al
+          uname -a
+
+      # - name: to app
+      #   run: |
+      #     cd ~
+      #     cd /usr/app/my-backend
+
+      # - name: pull code
+      #   run: |
+      #     git pull
+
+      # - name: install dependencies
+      #   run: |
+      #     npm install
+
+      # - name: push prisma schema
+      #   run: |
+      #     npx prisma migrate deploy
+
+      # - name: typescript build
+      #   run: |
+      #     npm run tsc:build
