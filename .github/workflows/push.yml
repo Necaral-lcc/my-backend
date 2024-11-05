@@ -53,13 +53,9 @@ jobs:
           private_key: ${{ secrets.SSH_PRIVATE_KEY }}
           host_fingerprint: ${{ secrets.SSH_KNOWN_HOST }}
           command: |
-            export NODE_NAME=/root/.nvm/versions/node/v18.12.0/bin/node
-            export PATH=$PATH:$NODE_NAME/bin
+            export NODE_NAME=/root/.nvm/versions/node/v18.12.0/bin/node &&
+            export PATH=$PATH:$NODE_NAME/bin &&
             echo "path: $PATH"
-            echo "node version: $(node -v)"
-            echo "npm version: $(npm -v)"
-            node -v
-            npm -v
 
       - name: Executing remote ssh commands
         uses: appleboy/ssh-action@v1.1.0
