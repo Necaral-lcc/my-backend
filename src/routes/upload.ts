@@ -4,6 +4,7 @@ import * as fs from 'fs'
 import { formatResponse } from '../utils'
 import * as path from 'path'
 import type { IRoute } from '.'
+import * as mime from 'mime-types'
 
 const upload = multer()
 
@@ -55,6 +56,24 @@ const uploadPromise = (file: multer.File) => {
   })
 }
 
+export const readFiles = async (ctx: Context) => {
+  try {
+    const { filename, type } = ctx.params
+    console.log(filename, type)
+
+    let filePath = path.join(__dirname, `../../uploads`, type, filename)
+
+    console.log(filePath)
+
+    let file = fs.readFileSync(filePath)
+    let mineType = mime.lookup(filePath) || 'text/plain'
+    ctx.set('Content-Type', mineType)
+    ctx.body = file
+  } catch (err) {
+    ctx.status = 404
+  }
+}
+
 const uploadList: IRoute[] = [
   {
     name: 'upload-multiple',
@@ -69,6 +88,13 @@ const uploadList: IRoute[] = [
     path: '/upload-simple',
     middleware: [uploadSimple],
     action: uploadFile,
+  },
+  {
+    name: 'upload',
+    type: 'get',
+    path: '/upload/:type/:filename',
+    middleware: [],
+    action: readFiles,
   },
 ]
 

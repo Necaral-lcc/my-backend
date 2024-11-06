@@ -15,7 +15,7 @@ const router = new Router()
 routesAction.forEach(({ path, type, action, middleware = [] }) => {
   if (type && action) {
     router[type](path, ...middleware, action)
-    // console.log(`注册路由${type} ${path}`)
+    console.log(`注册路由${type} ${path}`)
   }
 })
 
