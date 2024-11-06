@@ -27,7 +27,6 @@
     "noUnusedParameters": false,
     // "noFallthroughCasesInSwitch": false,
 
-    "outDir": "./dist",
     "baseUrl": ".",
 
     "typeRoots": ["src/types/index.d.ts"]
