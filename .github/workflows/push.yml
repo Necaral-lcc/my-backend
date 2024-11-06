@@ -35,15 +35,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Deploy
-        uses: cross-the-world/scp-pipeline@master
-        with:
-          host: ${{ secrets.SSH_HOST }} # 服务器IP（需要在GitHub上自行配置对应的secret）
-          user: ${{ secrets.SSH_USERNAME }} # 服务器用户名
-          pass: ${{ secrets.MY_PASSWORD }} # 服务器密码
-          connect_timeout: 10s
-          local: './' # 源路径（工作流）
-          remote: $SSH_URL # 目标路径（服务器）
+      # - name: Deploy
+      #   uses: cross-the-world/scp-pipeline@master
+      #   with:
+      #     host: ${{ secrets.SSH_HOST }} # 服务器IP（需要在GitHub上自行配置对应的secret）
+      #     user: ${{ secrets.SSH_USERNAME }} # 服务器用户名
+      #     pass: ${{ secrets.MY_PASSWORD }} # 服务器密码
+      #     connect_timeout: 10s
+      #     local: './' # 源路径（工作流）
+      #     remote: $SSH_URL # 目标路径（服务器）
 
       - name: Run remote command via SSH
         uses: D3rHase/ssh-command-action@latest
@@ -55,12 +55,12 @@ jobs:
           command: |
             echo "hello world"
 
-      # - name: Executing remote ssh commands
-      #   uses: appleboy/ssh-action@v1.1.0
-      #   with:
-      #     host: ${{ secrets.SSH_HOST }} # 服务器IP（需要在GitHub上自行配置对应的secret）
-      #     username: ${{ secrets.SSH_USERNAME }} # 服务器用户名
-      #     password: ${{ secrets.MY_PASSWORD }} # 服务器密码
-      #     envs: SSH_USERNAME,SSH_URL
-      #     script: |
-      #       cd $SSH_URL && git pull
+      - name: Executing remote ssh commands
+        uses: appleboy/ssh-action@v1.1.0
+        with:
+          host: ${{ secrets.SSH_HOST }} # 服务器IP（需要在GitHub上自行配置对应的secret）
+          username: ${{ secrets.SSH_USERNAME }} # 服务器用户名
+          password: ${{ secrets.MY_PASSWORD }} # 服务器密码
+          envs: SSH_USERNAME,SSH_URL
+          script: |
+            cd $SSH_URL && git pull
