@@ -63,4 +63,4 @@ jobs:
           password: ${{ secrets.MY_PASSWORD }} # 服务器密码
           envs: SSH_USERNAME,SSH_URL
           script: |
-            cd $SSH_URL && git pull
+            cd $SSH_URL && git fetch origin && git reset --hard origin/master
