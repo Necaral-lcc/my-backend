@@ -1,7 +1,7 @@
 model file {
   id          Int           @id @default(autoincrement())
   name        String
-  content     String
+  content     String?
   createdAt   DateTime      @default(now())
   userId      Int?
   user        User?         @relation(fields: [userId], references: [id])

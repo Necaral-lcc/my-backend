@@ -32,27 +32,28 @@ const uploadFiles = async (ctx: Context) => {
 }
 
 const uploadFile = async (ctx: Context) => {
-  const res = await uploadPromise(ctx.file)
-  if (res) {
-    ctx.body = formatResponse(res, '上传成功')
-  } else {
-    ctx.body = formatResponse(null, '上传失败')
+  try {
+    const res = await uploadPromise(ctx.file)
+    if (res) {
+      ctx.body = formatResponse(res, '上传成功')
+    } else {
+      ctx.body = formatResponse(null, '上传失败', 500)
+    }
+  } catch (err) {
+    ctx.body = formatResponse(err, '上传失败', 500)
   }
 }
 
 const uploadPromise = (file: multer.File) => {
   return new Promise((resolve, reject) => {
-    fs.writeFile(
-      path.join(__dirname, '../../uploads/', file.originalname),
-      file.buffer,
-      (err) => {
-        if (err) {
-          reject(err)
-        } else {
-          resolve(file.originalname)
-        }
+    const filePath = path.join(__dirname, '../../uploads/', file.originalname)
+    fs.writeFile(filePath, file.buffer, (err) => {
+      if (err) {
+        reject(err)
+      } else {
+        resolve({ name: file.originalname, filePath })
       }
-    )
+    })
   })
 }
 
