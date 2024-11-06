@@ -59,12 +59,7 @@ const uploadPromise = (file: multer.File) => {
 export const readFiles = async (ctx: Context) => {
   try {
     const { filename, type } = ctx.params
-    console.log(filename, type)
-
-    let filePath = path.join(__dirname, `../../uploads`, type, filename)
-
-    console.log(filePath)
-
+    let filePath = path.join(__dirname, `../../uploads/`, type, filename)
     let file = fs.readFileSync(filePath)
     let mineType = mime.lookup(filePath) || 'text/plain'
     ctx.set('Content-Type', mineType)
