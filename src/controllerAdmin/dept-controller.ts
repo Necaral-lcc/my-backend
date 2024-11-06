@@ -9,7 +9,7 @@ import * as jwt from 'jsonwebtoken'
 import { ITree, deepListToTree } from '../utils/tool'
 import PageService from '../servicePublic/page-service'
 import { sJWT } from '../types'
-import adminUserService from 'src/serviceAdmin/adminUser-service'
+import adminUserService from '../serviceAdmin/adminUser-service'
 
 /**
  * 用户创建部门
