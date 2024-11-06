@@ -15,6 +15,14 @@ class FileService {
     })
     return file
   }
+
+  async createMany(data: Prisma.fileCreateManyInput) {
+    const files = await prisma.file.createMany({
+      data: data,
+      skipDuplicates: true,
+    })
+    return files
+  }
 }
 
 export default new FileService()
