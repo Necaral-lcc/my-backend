@@ -5,6 +5,7 @@ import {
   getMenuOptions,
   updateMenu,
   deleteMenu,
+  getMenuTreeOptions,
 } from '../controllerAdmin/menu-controller'
 import {
   registerAdminUser,
@@ -22,6 +23,15 @@ import {
   deleteRole,
   getRoleOptions,
 } from '../controllerAdmin/role-controller'
+import {
+  createDept,
+  updateDept,
+  getDept,
+  getDepts,
+  getDeptOptions,
+  deleteDept,
+  getDeptTree,
+} from '../controllerAdmin/dept-controller'
 import { authPermission } from '../middleware/permission'
 import type { IRoute } from './index'
 import * as jwt from 'koa-jwt'
@@ -50,97 +60,174 @@ const list: IRoute[] = [
         routes: [
           // 菜单
           {
+            name: 'menu',
             path: '/menu',
-            type: 'post',
-            middleware: [authPermission('system:menu:add')],
-            action: createMenu,
-          },
-          { path: '/menu', type: 'get', action: getMenus },
-          {
-            path: '/menu/options',
-            type: 'get',
-            middleware: [authPermission('system:menu:list')],
-            action: getMenuOptions,
-          },
-          {
-            path: '/menu/:id',
-            type: 'get',
-            middleware: [authPermission('system:menu:edit')],
-            action: getMenu,
-          },
-          {
-            path: '/menu/:id',
-            type: 'put',
-            middleware: [authPermission('system:menu:edit')],
-            action: updateMenu,
-          },
-          {
-            path: '/menu/:id',
-            type: 'delete',
-            middleware: [authPermission('system:menu:del')],
-            action: deleteMenu,
+            middleware: [],
+            routes: [
+              {
+                path: '',
+                type: 'post',
+                middleware: [authPermission('system:menu:add')],
+                action: createMenu,
+              },
+              { path: '', type: 'get', action: getMenus },
+              {
+                path: '/options',
+                type: 'get',
+                middleware: [authPermission('system:menu:list')],
+                action: getMenuOptions,
+              },
+              {
+                path: '/tree',
+                type: 'get',
+                middleware: [authPermission('system:menu:list')],
+                action: getMenuTreeOptions,
+              },
+              {
+                path: '/:id',
+                type: 'get',
+                middleware: [authPermission('system:menu:edit')],
+                action: getMenu,
+              },
+              {
+                path: '/:id',
+                type: 'put',
+                middleware: [authPermission('system:menu:edit')],
+                action: updateMenu,
+              },
+              {
+                path: '/:id',
+                type: 'delete',
+                middleware: [authPermission('system:menu:del')],
+                action: deleteMenu,
+              },
+            ],
           },
           // 管理员
           {
+            name: 'admin-user',
             path: '/adminUser',
-            type: 'get',
-            middleware: [authPermission('system:admin:list')],
-            action: getAdminUsers,
-          },
-          {
-            path: '/adminUser/:id',
-            type: 'get',
-            middleware: [authPermission('system:admin:edit')],
-            action: getAdminUserForm,
-          },
-          {
-            path: '/adminUser/:id',
-            type: 'put',
-            middleware: [authPermission('system:admin:edit')],
-            action: updateAdminUser,
-          },
-          {
-            path: '/adminUser',
-            type: 'post',
-            middleware: [authPermission('system:admin:add')],
-            action: registerAdminUser,
+            middleware: [],
+            routes: [
+              {
+                path: '',
+                type: 'get',
+                middleware: [authPermission('system:admin:list')],
+                action: getAdminUsers,
+              },
+              {
+                path: '/:id',
+                type: 'get',
+                middleware: [authPermission('system:admin:edit')],
+                action: getAdminUserForm,
+              },
+              {
+                path: '/:id',
+                type: 'put',
+                middleware: [authPermission('system:admin:edit')],
+                action: updateAdminUser,
+              },
+              {
+                path: '',
+                type: 'post',
+                middleware: [authPermission('system:admin:add')],
+                action: registerAdminUser,
+              },
+            ],
           },
           // 角色
           {
+            name: 'role',
             path: '/role',
-            type: 'get',
-            middleware: [authPermission('system:role:add')],
-            action: getRoles,
+            middleware: [],
+            routes: [
+              {
+                path: '',
+                type: 'get',
+                middleware: [authPermission('system:role:list')],
+                action: getRoles,
+              },
+              {
+                path: '/options',
+                type: 'get',
+                middleware: [authPermission('system:role:options')],
+                action: getRoleOptions,
+              },
+              {
+                path: '/:id',
+                type: 'get',
+                middleware: [authPermission('system:role:edit')],
+                action: getRole,
+              },
+              {
+                path: '/:id',
+                type: 'put',
+                middleware: [authPermission('system:role:edit')],
+                action: updateRole,
+              },
+              {
+                path: '/:id',
+                type: 'delete',
+                middleware: [authPermission('system:role:del')],
+                action: deleteRole,
+              },
+              {
+                path: '',
+                type: 'post',
+                middleware: [authPermission('system:role:add')],
+                action: createRole,
+              },
+            ],
           },
+          // 部门
           {
-            path: '/role/options',
-            type: 'get',
-            middleware: [authPermission('system:role:list')],
-            action: getRoleOptions,
-          },
-          {
-            path: '/role/:id',
-            type: 'get',
-            middleware: [authPermission('system:role:edit')],
-            action: getRole,
-          },
-          {
-            path: '/role/:id',
-            type: 'put',
-            middleware: [authPermission('system:role:edit')],
-            action: updateRole,
-          },
-          {
-            path: '/role/:id',
-            type: 'delete',
-            middleware: [authPermission('system:role:del')],
-            action: deleteRole,
-          },
-          {
-            path: '/role',
-            type: 'post',
-            middleware: [authPermission('system:role:add')],
-            action: createRole,
+            name: 'dept',
+            path: '/dept',
+            middleware: [],
+            routes: [
+              {
+                path: '',
+                type: 'get',
+                middleware: [authPermission('system:dept:list')],
+                action: getDepts,
+              },
+              {
+                path: '/options',
+                type: 'get',
+                middleware: [authPermission('system:dept:option')],
+                action: getDeptOptions,
+              },
+              {
+                path: '/tree',
+                type: 'get',
+                middleware: [authPermission('system:dept:tree')],
+                action: getDeptTree,
+              },
+              {
+                path: '/:id',
+                type: 'get',
+                middleware: [authPermission('system:dept:edit')],
+                action: getDept,
+              },
+              {
+                path: '/:id',
+                type: 'put',
+                middleware: [authPermission('system:dept:edit')],
+                action: updateDept,
+              },
+              {
+                path: '/:id',
+                type: 'delete',
+                middleware: [authPermission('system:dept:del')],
+                action: deleteDept,
+              },
+              {
+                path: '',
+                type: 'post',
+                middleware: [authPermission('system:dept:add')],
+                action: createDept,
+              },
+            ],
           },
         ],
       },

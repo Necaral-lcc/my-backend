@@ -178,6 +178,10 @@ export const updateAdminUser = async (ctx: Context) => {
       ctx.body = formatResponse(null, 'id不能为空', 400)
       return
     }
+    if (Number(id) === 1) {
+      ctx.body = formatResponse(null, '不能修改超级管理员', 400)
+      return
+    }
     const { name, password, email, roleId, deptId, nickname, status } = ctx
       .request.body as sAdminUserCreateParams
     const repeat = await adminUserService.getById(Number(id))
@@ -233,6 +237,10 @@ export const deleteAdminUser = async (ctx: Context) => {
   try {
     if (!id || !Number(id)) {
       ctx.body = formatResponse(null, 'id不能为空', 400)
+      return
+    }
+    if (Number(id) === 1) {
+      ctx.body = formatResponse(null, '不能删除超级管理员', 400)
       return
     }
     const result = await adminUserService.delete(Number(id))

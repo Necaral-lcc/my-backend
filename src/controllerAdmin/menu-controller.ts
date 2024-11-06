@@ -7,7 +7,7 @@ import { Prisma } from '@prisma/client'
 import { isEmail, isPassword, formatResponse, isNumber } from '../utils'
 import * as jwt from 'jsonwebtoken'
 import { TOKEN_KEY, JWT_EXPIRE_TIME } from '../config'
-import { listToTree } from '../utils/tool'
+import { deepListToTree } from '../utils/tool'
 
 /**
  * 用户创建权限菜单
@@ -89,25 +89,48 @@ export const getMenu = async (ctx: Context) => {
  * @param ctx
  */
 export const getMenus = async (ctx: Context) => {
-  const menus = await menuService.getMenuList()
-  if (menus) {
-    ctx.body = formatResponse(listToTree(menus, null), '菜单列表获取成功')
-  } else {
-    ctx.body = formatResponse(null, '菜单列表获取失败')
+  const { parentId } = ctx.query as { parentId?: string }
+  try {
+    const menus = await menuService.getMenuList(Number(parentId) || null)
+    const tree = await deepListToTree(menus, menuService.getMenuList)
+    if (tree) {
+      ctx.body = formatResponse(tree, '菜单列表获取成功')
+    } else {
+      ctx.body = formatResponse(null, '菜单列表获取失败', 500)
+    }
+  } catch (e) {
+    ctx.body = formatResponse(e, '菜单列表获取失败', 500)
+  }
+}
+
+export const getMenuTreeOptions = async (ctx: Context) => {
+  try {
+    const menus = await menuService.getMenuOptionByParentId(null)
+    const tree = await deepListToTree(
+      menus,
+      menuService.getMenuOptionByParentId
+    )
+    if (tree) {
+      ctx.body = formatResponse(tree, '菜单选项树获取成功')
+    } else {
+      ctx.body = formatResponse(null, '菜单选项树获取失败', 500)
+    }
+  } catch (e) {
+    ctx.body = formatResponse(e, '菜单选项树获取失败', 500)
   }
 }
 
 export const getMenuOptions = async (ctx: Context) => {
-  const menus = await menuService.getMenuOptions()
-  if (menus) {
-    menus.forEach((menu) => {
-      if (menu.parentId === null) {
-        menu.parentId = 0
-      }
-    })
-    ctx.body = formatResponse(menus, '菜单树获取成功')
-  } else {
-    ctx.body = formatResponse(null, '菜单树获取失败')
+  try {
+    const menus = await menuService.getMenuOptions()
+    const tree = await deepListToTree(menus, menuService.getMenuOptions)
+    if (tree) {
+      ctx.body = formatResponse(tree, '菜单树获取成功')
+    } else {
+      ctx.body = formatResponse(null, '菜单树获取失败', 500)
+    }
+  } catch (e) {
+    ctx.body = formatResponse(e, '菜单树获取失败', 500)
   }
 }
 /**
@@ -137,7 +160,7 @@ export const updateMenu = async (ctx: Context) => {
   try {
     if (isNumber(id) && Number(id) > 0) {
       if (!name) {
-        ctx.body = formatResponse(null, '请输入菜单名称')
+        ctx.body = formatResponse(null, '请输入菜单名称', 400)
         return
       }
       const menuExists = await menuService.getMenuById(Number(id))

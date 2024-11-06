@@ -13,9 +13,8 @@ const router = new Router()
 
 // 注册路由以及中间件
 routesAction.forEach(({ path, type, action, middleware = [] }) => {
-  if (type) {
-    const r = router as any
-    r[type](path, ...middleware, action)
+  if (type && action) {
+    router[type](path, ...middleware, action)
     // console.log(`注册路由${type} ${path}`)
   }
 })

@@ -1,5 +1,6 @@
 import { Prisma, PrismaClient } from '@prisma/client'
 import prisma from '../prisma'
+import { sList } from 'src/utils/tool'
 
 /**
  * Service用来处理逻辑，返回结果给Controller
@@ -15,8 +16,14 @@ const deptSelect: Prisma.DeptSelect = {
   parentId: true,
 }
 
+export interface IDeptList {
+  id: number
+  name: string
+  parentId: number | null
+}
+
 class DeptService {
-  async upsert({
+  async create({
     id,
     parentId,
     ...data
@@ -24,10 +31,8 @@ class DeptService {
     id?: number
     parentId?: number | null
   }) {
-    const dept = prisma.dept.upsert({
-      create: { ...data, parentId },
-      update: { ...data, parentId, deletedFlag: false },
-      where: { id, deletedFlag: true },
+    const dept = prisma.dept.create({
+      data: { ...data, parentId },
       select: deptSelect,
     })
     return dept
@@ -50,8 +55,8 @@ class DeptService {
     return dept
   }
 
-  async getDepts() {
-    const where = { deletedFlag: false }
+  async getDepts(parentId: number | null) {
+    const where = { parentId, deletedFlag: false }
     const depts = await prisma.dept.findMany({
       where,
       orderBy: { id: 'asc' },
@@ -83,12 +88,35 @@ class DeptService {
   }
 
   async delete(id: number) {
-    const del = await prisma.dept.update({
-      where: { id, deletedFlag: false },
-      data: { deletedFlag: true },
-      select: deptSelect,
+    const del = await prisma.dept.delete({
+      where: { id },
+      select: { id: true },
     })
     return del
+  }
+
+  async getDeptByParentId(parentId: number | null) {
+    const list = await prisma.dept.findMany({
+      where: { parentId, deletedFlag: false },
+      select: {
+        id: true,
+        name: true,
+        parentId: true,
+      },
+    })
+    return list
+  }
+
+  async getDeptById(id: number) {
+    const dept = await prisma.dept.findUnique({
+      where: { id, deletedFlag: false },
+      select: {
+        id: true,
+        name: true,
+        parentId: true,
+      },
+    })
+    return dept
   }
 }
 

@@ -117,8 +117,18 @@ class AdminUserService {
         nickname: true,
         status: true,
         email: true,
-        roleId: true,
-        deptId: true,
+        role: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        dept: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
         createdAt: true,
         updatedAt: true,
       },
@@ -178,6 +188,7 @@ class AdminUserService {
       select: {
         id: true,
         name: true,
+        deptId: true,
       },
     })
     return adminUser

@@ -3,11 +3,20 @@ import adminList from './adminList'
 import appList from './appList'
 import uploadList from './upload'
 
+type sRouterFunc =
+  | 'get'
+  | 'post'
+  | 'put'
+  | 'delete'
+  | 'patch'
+  | 'options'
+  | 'head'
+
 export interface IRoute {
   name?: string
   path: string
   routes?: IRoute[]
-  type?: string
+  type?: sRouterFunc
   middleware?: Middleware[]
   action?: (ctx: Context) => Promise<void | Context>
 }

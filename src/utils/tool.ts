@@ -1,9 +1,9 @@
-interface sList {
+export interface sList {
   id: number
   parentId: number | null
 }
 
-type ITree<T extends Object> = T & {
+export type ITree<T extends Object> = T & {
   children: ITree<T>[]
 }
 /**
@@ -29,4 +29,33 @@ export const listToTree = <T extends sList>(
       }
       return obj
     })
+}
+
+type vPromiseFunc<T extends sList> = (id: number | null) => Promise<T[]>
+
+/**
+ * 树结构深度遍历 promise
+ * @param list  列表
+ * @param promiseFunc 异步函数
+ * @returns {Promise<ITree<T>[]>} 树结构
+ */
+export const deepListToTree = async <T extends sList>(
+  list: Array<T>,
+  promiseFunc: vPromiseFunc<T>
+) => {
+  const result = await Promise.all(
+    list.map(async (l) => {
+      const res = await promiseFunc(l.id)
+      const d: ITree<T> = {
+        ...l,
+        parentId: l.parentId || 0,
+        children: [],
+      }
+      if (res.length) {
+        d.children = await deepListToTree<T>(res, promiseFunc)
+      }
+      return d
+    })
+  )
+  return result
 }
