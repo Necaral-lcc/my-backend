@@ -30,7 +30,7 @@ const uploadList: IRoute[] = [
   {
     name: 'upload',
     type: 'get',
-    path: '/upload/:type/:filename',
+    path: '/source/:type/:filename',
     middleware: [],
     action: readFiles,
   },
