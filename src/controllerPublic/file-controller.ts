@@ -18,6 +18,8 @@ interface sUploadFile {
   hash: string
 }
 
+const file_reg = /^([\s\S]*)\.(pdf|png|jpeg|jpg|docx|xlsx|pjpg|svg)$/
+
 export const uploadFiles = async (ctx: Context) => {
   if (!ctx.files) {
     ctx.body = formatResponse(null, '上传失败，请选择文件')
@@ -54,25 +56,24 @@ export const uploadFile = async (ctx: Context) => {
 
 const uploadPromise = (file: multer.File) => {
   return new Promise<sUploadFile>((resolve, reject) => {
-    const filePath = path.join(
-      __dirname,
-      '../../uploads/files',
-      file.originalname
-    )
-    fs.writeFile(filePath, file.buffer, (err) => {
-      if (err) {
-        reject(err)
-      } else {
-        hashFile(file.buffer).then((hash) => {
+    hashFile(file.buffer).then((hash) => {
+      console.log('file hash', file)
+
+      const filename = `${hash}.${getExtensionFromMimeType(file.mimetype)}`
+      const filePath = path.join(__dirname, '../../uploads/files', filename)
+      fs.writeFile(filePath, file.buffer, (err) => {
+        if (err) {
+          reject(err)
+        } else {
           resolve({
-            name: file.originalname,
-            filePath,
-            mimetype: mime.lookup(filePath) || '',
+            name: filename,
+            filePath: path.join('../../uploads/files', filename),
+            mimetype: file.mimetype,
             size: file.size,
             hash,
           })
-        })
-      }
+        }
+      })
     })
   })
 }
@@ -90,4 +91,26 @@ export const readFiles = async (ctx: Context) => {
   } catch (err) {
     ctx.status = 404
   }
+}
+
+function getExtensionFromMimeType(mimeType: string) {
+  const extensionMap: Record<string, string> = {
+    'application/pdf': 'pdf',
+    'application/msword': 'doc',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+      'docx',
+    'application/vnd.ms-excel': 'xls',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'xlsx',
+    'application/vnd.ms-powerpoint': 'ppt',
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation':
+      'pptx',
+    'image/jpeg': 'jpg',
+    'image/png': 'png',
+    'text/csv': 'csv',
+    'text/plain': 'txt',
+    'image/svg+xml': 'svg',
+    'image/pjpeg': 'pjpg',
+  }
+
+  return extensionMap[mimeType] || null
 }

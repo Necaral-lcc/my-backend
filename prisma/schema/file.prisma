@@ -12,6 +12,7 @@ model file {
   size        Int
   mimetype    String?
   extension   String?
+  filePath    String?
 }
 
 /// Enums  USER 0, ADMIN 1
