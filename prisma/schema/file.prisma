@@ -1,18 +1,19 @@
 model file {
-  id          Int           @id @default(autoincrement())
-  name        String
-  content     String?
-  createdAt   DateTime      @default(now())
-  userId      Int?
-  user        User?         @relation(fields: [userId], references: [id])
-  adminUserId Int?
-  adminUser   AdminUser?    @relation(fields: [adminUserId], references: [id])
-  uploadBy    FileUploadBy?
-  hash        String        @unique
-  size        Int
-  mimetype    String?
-  extension   String?
-  filePath    String?
+  id           Int           @id @default(autoincrement())
+  name         String
+  previousName String
+  content      String?
+  createdAt    DateTime      @default(now())
+  userId       Int?
+  user         User?         @relation(fields: [userId], references: [id])
+  adminUserId  Int?
+  adminUser    AdminUser?    @relation(fields: [adminUserId], references: [id])
+  uploadBy     FileUploadBy?
+  hash         String        @unique
+  size         Int
+  mimetype     String?
+  extension    String?
+  filePath     String?
 }
 
 /// Enums  USER 0, ADMIN 1

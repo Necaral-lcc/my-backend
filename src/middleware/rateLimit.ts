@@ -4,6 +4,7 @@ import {
 } from 'rate-limiter-flexible'
 import * as Koa from 'koa'
 import { formatResponse } from '../utils'
+import { Worker } from 'cluster'
 
 const options: IRateLimiterOptions = {
   points: 10, // 6 points

@@ -1,3 +1,5 @@
+import { SERVER_URL } from '../config'
+
 export interface sList {
   id: number
   parentId: number | null

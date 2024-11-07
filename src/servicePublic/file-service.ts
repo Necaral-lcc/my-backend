@@ -6,22 +6,40 @@ import prisma from '../prisma'
 
 class FileService {
   async create(data: Prisma.fileCreateInput) {
+    console.log('data', data)
+
     const file = await prisma.file.create({
-      data: data,
+      data,
       select: {
         id: true,
         name: true,
+        previousName: true,
+        filePath: true,
+        mimetype: true,
+        size: true,
+        hash: true,
       },
     })
     return file
   }
 
-  async createMany(data: Prisma.fileCreateManyInput) {
-    const files = await prisma.file.createMany({
-      data: data,
-      skipDuplicates: true,
+  async findUnique(hash: string) {
+    console.log('findUnique hash', hash)
+    const file = await prisma.file.findUnique({
+      where: {
+        hash,
+      },
+      select: {
+        id: true,
+        name: true,
+        previousName: true,
+        filePath: true,
+        mimetype: true,
+        size: true,
+        hash: true,
+      },
     })
-    return files
+    return file
   }
 }
 

@@ -9,13 +9,11 @@ import * as path from 'path'
 import * as mime from 'mime-types'
 import fileService from '../servicePublic/file-service'
 import { hashFile } from '../utils/bcrypt'
+import { SERVER_URL } from '../config'
 
 interface sUploadFile {
   name: string
   filePath: string
-  mimetype: string
-  size: number
-  hash: string
 }
 
 const file_reg = /^([\s\S]*)\.(pdf|png|jpeg|jpg|docx|xlsx|pjpg|svg)$/
@@ -29,9 +27,8 @@ export const uploadFiles = async (ctx: Context) => {
   try {
     const res = await Promise.all(
       files.map(async (file) => {
-        const res = await uploadPromise(file)
-        const f = await fileService.create(res)
-        return f
+        const re = await uploadPromise(file)
+        return re
       })
     )
     ctx.body = formatResponse(res, '上传成功')
@@ -44,8 +41,7 @@ export const uploadFile = async (ctx: Context) => {
   try {
     const res = await uploadPromise(ctx.file)
     if (res) {
-      const file = await fileService.create(res)
-      ctx.body = formatResponse(file, '上传成功')
+      ctx.body = formatResponse(res, '上传成功')
     } else {
       ctx.body = formatResponse(null, '上传失败', 500)
     }
@@ -55,29 +51,29 @@ export const uploadFile = async (ctx: Context) => {
 }
 
 const uploadPromise = (file: multer.File) => {
-  return new Promise<sUploadFile>((resolve, reject) => {
-    hashFile(file.buffer).then((hash) => {
-      console.log('file hash', file)
-
-      const filename = `${hash}.${getExtensionFromMimeType(file.mimetype)}`
-      const filePath = path.join(__dirname, '../../uploads/files', filename)
-      fs.writeFile(filePath, file.buffer, (err) => {
-        if (err) {
-          reject(err)
-        } else {
-          resolve({
-            name: filename,
-            filePath: path.join('../../uploads/files', filename),
-            mimetype: file.mimetype,
-            size: file.size,
-            hash,
-          })
-        }
-      })
+  return new Promise<sUploadFile>(async (resolve, reject) => {
+    const filePath = path.join(
+      __dirname,
+      '../../uploads/files/',
+      file.originalname
+    )
+    fs.writeFile(filePath, file.buffer, (err) => {
+      if (err) {
+        reject(err)
+      } else {
+        resolve({
+          name: file.originalname,
+          filePath: getFilepath(file.originalname),
+        })
+      }
     })
   })
 }
 
+/**
+ * 获取服务器文件访问路径
+ * @param ctx
+ */
 export const readFiles = async (ctx: Context) => {
   try {
     const { filename, type } = ctx.params
@@ -90,7 +86,17 @@ export const readFiles = async (ctx: Context) => {
     ctx.body = file
   } catch (err) {
     ctx.status = 404
+    ctx.body = formatResponse(err, '文件不存在', 404)
   }
+}
+
+/**
+ * 获取文件访问路径
+ * @param filename
+ * @returns
+ */
+export const getFilepath = (filename: string) => {
+  return `${SERVER_URL}/source/files/${filename}`
 }
 
 function getExtensionFromMimeType(mimeType: string) {

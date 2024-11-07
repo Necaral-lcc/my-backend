@@ -28,9 +28,12 @@ export const TOKEN_KEY = process.env.TOKEN_KEY || 'token'
  */
 export const JWT_EXPIRE_TIME = process.env.JWT_EXPIRE_TIME || 3600000
 
+export const SERVER_URL = process.env.SERVER_URL || ''
+
 console.log('nodeEnv:', nodeEnv)
 console.log('PORT:', PORT)
 console.log('ADMIN_SECRET_KEY:', ADMIN_SECRET_KEY)
 console.log('APP_SECRET_KEY:', APP_SECRET_KEY)
 console.log('TOKEN_KEY:', TOKEN_KEY)
 console.log('JWT_EXPIRE_TIME:', JWT_EXPIRE_TIME)
+console.log('SERVER_URL:', SERVER_URL)

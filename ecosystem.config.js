@@ -4,16 +4,18 @@
  */
 const { name } = require('./package.json')
 const path = require('path')
+const os = require('os')
 
 module.exports = {
   apps: [
     {
       name,
       script: path.resolve(__dirname, './src/index.ts'),
-      instances: 1,
+      instances: os.cpus().length,
       interpreter: 'ts-node',
       ignore_watch: ['node_modules', 'logs', 'uploads', '.github'],
-      watch: true,
+      watch: ['src', 'package.json'],
+
       env_production: {
         NODE_ENV: 'production',
       },
