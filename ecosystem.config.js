@@ -15,7 +15,6 @@ module.exports = {
       interpreter: 'ts-node',
       ignore_watch: ['node_modules', 'logs', 'uploads', '.github'],
       watch: ['src', 'package.json'],
-
       env_production: {
         NODE_ENV: 'production',
       },

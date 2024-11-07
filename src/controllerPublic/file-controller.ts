@@ -18,6 +18,11 @@ interface sUploadFile {
 
 const file_reg = /^([\s\S]*)\.(pdf|png|jpeg|jpg|docx|xlsx|pjpg|svg)$/
 
+/**
+ * 上传多个文件
+ * @param ctx
+ * @returns
+ */
 export const uploadFiles = async (ctx: Context) => {
   if (!ctx.files) {
     ctx.body = formatResponse(null, '上传失败，请选择文件')
@@ -37,6 +42,11 @@ export const uploadFiles = async (ctx: Context) => {
   }
 }
 
+/**
+ * 上传单个文件
+ * @param ctx
+ * @returns
+ */
 export const uploadFile = async (ctx: Context) => {
   try {
     const res = await uploadPromise(ctx.file)
@@ -50,6 +60,11 @@ export const uploadFile = async (ctx: Context) => {
   }
 }
 
+/**
+ * 上传文件
+ * @param file
+ * @returns
+ */
 const uploadPromise = (file: multer.File) => {
   return new Promise<sUploadFile>(async (resolve, reject) => {
     const filePath = path.join(
@@ -98,7 +113,11 @@ export const readFiles = async (ctx: Context) => {
 export const getFilepath = (filename: string) => {
   return `${SERVER_URL}/source/files/${filename}`
 }
-
+/**
+ * 获取文件mimeType
+ * @param mimeType
+ * @returns string | null
+ */
 function getExtensionFromMimeType(mimeType: string) {
   const extensionMap: Record<string, string> = {
     'application/pdf': 'pdf',

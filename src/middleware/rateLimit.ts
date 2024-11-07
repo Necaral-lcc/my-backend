@@ -13,6 +13,11 @@ const options: IRateLimiterOptions = {
 
 const rateLimiter = new RateLimiterMemory(options)
 
+/**
+ * 访问限制中间件
+ * @param opt IRateLimiterOptions
+ * @returns
+ */
 export const rateLimit =
   (opt?: IRateLimiterOptions) => async (ctx: Koa.Context, next: Koa.Next) => {
     const key = `rateLimit:${ctx.request.ip}_${ctx.request.url}`
