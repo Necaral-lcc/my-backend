@@ -122,6 +122,11 @@ class DeptService {
   async getDeptByParentIdWithAll(parentId: number | null) {
     const list = await prisma.dept.findMany({
       where: { parentId, deletedFlag: false },
+      select: {
+        id: true,
+        name: true,
+        parentId: true,
+      },
     })
     return list
   }

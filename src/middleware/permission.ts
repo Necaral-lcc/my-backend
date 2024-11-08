@@ -6,19 +6,15 @@ import { formatResponse, isNumber } from '../utils'
 import redis from '../redis'
 import adminUserService from '../serviceAdmin/adminUser-service'
 import deptService from '../serviceAdmin/dept-service'
+import { ADMIN_USER_ID } from '../config'
 
 export interface sDataPermission {
   depts: sPrismaDept[]
 }
 
-interface sPrismaDept {
+export interface sPrismaDept {
   id: number
   name: string
-  description: string | null
-  status: boolean
-  deletedFlag: boolean
-  createdAt: Date
-  updatedAt: Date
   parentId: number | null
 }
 
@@ -34,8 +30,15 @@ export const authPermission =
   (per: string) => async (ctx: Koa.Context, next: Koa.Next) => {
     const { id } = ctx.state.user as sJWT
     // 管理员拥有所有权限
-    if (id === 1) {
+    if (id === ADMIN_USER_ID) {
       // 管理员拥有所有权限,任何请求都可以访问
+      await next()
+      return
+    }
+    const redisKey = `redis:${id}:permission:${per}`
+    const redisValue = await redis.get(redisKey)
+    if (redisValue) {
+      // 缓存中有权限
       await next()
       return
     }
@@ -45,6 +48,13 @@ export const authPermission =
       per
     )
     if (userPermission?.role?.menuOnRole.length) {
+      // 用户有权限
+      const result = await redis.set(redisKey, '1', 'EX', 30)
+      if (result !== 'OK') {
+        console.error('redis set failed')
+        ctx.body = formatResponse(null, '服务器内部错误', 500)
+        return
+      }
       await next()
       return
     } else {
@@ -60,9 +70,11 @@ export const authPermission =
  */
 export const dataPermission =
   () => async (ctx: Koa.Context, next: Koa.Next) => {
-    const { id } = ctx.state.user as sJWT
+    const { id, deptId } = ctx.state.user as sJWT
+    const redisKey = `redis:${id}:data:deptIds`
+
     // 管理员拥有所有数据权限
-    if (id === 1) {
+    if (id === ADMIN_USER_ID) {
       // 管理员拥有所有数据权限,任何数据都可以访问
       ctx.state.dataPermission = {
         depts: [],
@@ -70,7 +82,10 @@ export const dataPermission =
       await next()
       return
     } else {
-      const redisKey = `redis:${id}:data:deptIds`
+      if (!deptId) {
+        ctx.body = formatResponse(null, '未分配部门', 500)
+        return
+      }
       const redisValue = await redis.get(redisKey)
       if (redisValue) {
         ctx.state.dataPermission = {
@@ -79,16 +94,8 @@ export const dataPermission =
         await next()
         return
       }
-      const adminUser = await adminUserService.getById(id)
-      if (!adminUser) {
-        ctx.body = formatResponse(null, '用户不存在', 401)
-        return
-      }
-      if (!adminUser.deptId) {
-        ctx.body = formatResponse(null, '用户没有任何部门权限', 500)
-        return
-      }
-      const dept = await deptService.getDeptById(adminUser.deptId)
+
+      const dept = await deptService.getDeptById(deptId)
       if (!dept) {
         ctx.body = formatResponse(null, '部门不存在', 500)
         return
@@ -97,7 +104,7 @@ export const dataPermission =
         [dept],
         deptService.getDeptByParentIdWithAll
       )
-      const result = await redis.set(redisKey, JSON.stringify(depts), 'EX', 60)
+      const result = await redis.set(redisKey, JSON.stringify(depts), 'EX', 30)
       if (result !== 'OK') {
         console.error('redis set failed')
         ctx.body = formatResponse(null, '服务器内部错误', 500)
@@ -116,29 +123,24 @@ export const dataPermission =
  * @param deptId 部门id
  * @returns
  */
-export const hasDataPermission = (
+export const hasDataPermission = async (
   ctx: Koa.Context,
-  deptId?: number | string | null
+  selectedDeptId: number | string
 ) => {
-  return new Promise<boolean>((resolve) => {
-    const permissions = ctx.state.dataPermission as sDataPermission
-    if (!deptId) {
-      resolve(false)
-      return
-    }
-    if (!isNumber(deptId)) {
-      resolve(false)
-      return
-    }
-    if (permissions.depts.length === 0) {
-      // 管理员拥有所有权限
-      resolve(true)
-    } else if (permissions.depts.some((item) => item.id === deptId)) {
-      // 用户有数据权限
-      resolve(true)
-    } else {
-      // 用户没有数据权限
-      resolve(false)
-    }
-  })
+  const permissions = ctx.state.dataPermission as sDataPermission
+  const { id } = ctx.state.user as sJWT
+
+  if (id === ADMIN_USER_ID) {
+    // 管理员拥有所有数据权限
+    return true
+  }
+
+  const bol = permissions.depts.some((item) => item.id == selectedDeptId)
+  if (bol) {
+    // 用户有数据权限
+    return true
+  } else {
+    // 用户没有数据权限
+    return false
+  }
 }

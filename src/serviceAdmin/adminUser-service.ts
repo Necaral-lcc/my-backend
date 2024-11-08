@@ -4,6 +4,7 @@ import { PageParams } from './type'
 import { DefaultArgs } from '@prisma/client/runtime/library'
 import { formatPageResponse } from '../utils'
 import prisma from '../prisma'
+import { type sPrismaDept } from '../middleware/permission'
 
 /**
  * Service用来处理逻辑，返回结果给Controller
@@ -44,6 +45,9 @@ class AdminUserService {
         name: true,
         nickname: true,
         password: true,
+        deptId: true,
+        roleId: true,
+        status: true,
       },
     })
     return adminUser
@@ -90,14 +94,30 @@ class AdminUserService {
     pageParams: Pick<PageParams, 'page' | 'pageSize'> & {
       name?: string
       email?: string
-    }
+    },
+    depts: sPrismaDept[] = []
   ) {
     const { page, pageSize, name } = pageParams
     const skip = (page - 1) * pageSize
-    const where = {
-      name: { contains: name },
-      deletedFlag: false,
+    const where: Prisma.AdminUserWhereInput = {
+      NOT: {
+        deletedFlag: true,
+      },
+      AND: [
+        {
+          name: {
+            contains: name,
+          },
+        },
+      ],
     }
+    if (depts.length) {
+      where.OR = depts.map((item) => ({
+        deptId: item.id,
+      }))
+    }
+    console.log(where)
+
     const count = await prisma.adminUser.count({
       where,
     })
@@ -160,12 +180,22 @@ class AdminUserService {
     })
     return adminUser
   }
-  async formDetail(id: number) {
-    const adminUser = await prisma.adminUser.findUnique({
-      where: {
-        id,
-        deletedFlag: false,
-      },
+  async formDetail(id: number, depts: sPrismaDept[] = []) {
+    const where: Prisma.AdminUserWhereInput = {
+      AND: [
+        {
+          id,
+          deletedFlag: false,
+        },
+      ],
+    }
+    if (depts.length) {
+      where.OR = depts.map((item) => ({
+        deptId: item.id,
+      }))
+    }
+    const adminUser = await prisma.adminUser.findFirst({
+      where,
       select: {
         id: true,
         name: true,
@@ -227,10 +257,7 @@ class AdminUserService {
   }
 
   async delete(id: number) {
-    const adminUser = prisma.adminUser.update({
-      data: {
-        deletedFlag: true,
-      },
+    const adminUser = prisma.adminUser.delete({
       where: {
         id,
         deletedFlag: false,
@@ -238,13 +265,6 @@ class AdminUserService {
       select: {
         id: true,
         name: true,
-        nickname: true,
-        email: true,
-        roleId: true,
-        deptId: true,
-        createdAt: true,
-        updatedAt: true,
-        status: true,
       },
     })
     return adminUser

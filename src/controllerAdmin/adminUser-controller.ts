@@ -4,7 +4,12 @@
 import { Context } from 'koa'
 import { isEmail, isPassword, formatResponse } from '../utils'
 import * as jwt from 'jsonwebtoken'
-import { ADMIN_SECRET_KEY, TOKEN_KEY, JWT_EXPIRE_TIME } from '../config'
+import {
+  ADMIN_SECRET_KEY,
+  TOKEN_KEY,
+  JWT_EXPIRE_TIME,
+  ADMIN_USER_ID,
+} from '../config'
 import { createToken } from '../utils/token'
 import adminUserService, {
   sAdminUserCreateParams,
@@ -15,12 +20,14 @@ import { sAdminUserInfo } from './type'
 import menuService from '../serviceAdmin/menu-service.ts'
 import PageService from '../servicePublic/page-service.ts'
 import { listToTree } from '../utils/tool'
+import { hasDataPermission, sPrismaDept } from '../middleware/permission.ts'
 
 /**
  * 管理员创建
  * @param ctx
  */
 export const registerAdminUser = async (ctx: Context) => {
+  const user = ctx.state.user as sJWT
   const { name, password, email, roleId, deptId, nickname } = ctx.request
     .body as sAdminUserCreateParams
   if (!name || !password) {
@@ -87,7 +94,7 @@ export const loginAdminUser = async (ctx: Context) => {
       ctx.body = formatResponse(null, '用户名或密码错误', 400)
       return
     }
-    const token = createToken({ id: user.id, email: user.email })
+    const token = createToken({ id: user.id, deptId: user.deptId })
     ctx.response.set(TOKEN_KEY, token)
     ctx.body = formatResponse(token, '登录成功!')
   } catch (error) {
@@ -101,6 +108,8 @@ export const loginAdminUser = async (ctx: Context) => {
  */
 export const getAdminUsers = async (ctx: Context) => {
   try {
+    const user = ctx.state.user as sJWT
+    const dataPermission = ctx.state.dataPermission.depts as sPrismaDept[]
     const pager = await PageService.isPage(ctx)
     const { page, pageSize, name, email } = pager
     if (Number(page) <= 0) {
@@ -111,19 +120,36 @@ export const getAdminUsers = async (ctx: Context) => {
       ctx.body = formatResponse(null, 'pageSize参数必须大于1', 400)
       return
     }
-    const list = await adminUserService.list({
-      page: Number(page),
-      pageSize: Number(pageSize),
-      name,
-      email,
-    })
-    if (list) {
-      ctx.body = formatResponse(list, '获取成功')
+    if (user.id === ADMIN_USER_ID) {
+      const list = await adminUserService.list({
+        page: Number(page),
+        pageSize: Number(pageSize),
+        name,
+        email,
+      })
+      if (list) {
+        ctx.body = formatResponse(list, '获取成功')
+      } else {
+        ctx.body = formatResponse(null, '获取失败1', 500)
+      }
     } else {
-      ctx.body = formatResponse(null, '获取失败', 500)
+      const list = await adminUserService.list(
+        {
+          page: Number(page),
+          pageSize: Number(pageSize),
+          name,
+          email,
+        },
+        dataPermission
+      )
+      if (list) {
+        ctx.body = formatResponse(list, '获取成功')
+      } else {
+        ctx.body = formatResponse(null, '获取失败2', 500)
+      }
     }
   } catch (error) {
-    ctx.body = formatResponse(error, '获取失败', 500)
+    ctx.body = formatResponse(error, '系统错误', 500)
     return
   }
 }
@@ -133,13 +159,19 @@ export const getAdminUsers = async (ctx: Context) => {
  * @returns {Promise<void>}
  */
 export const getAdminUserForm = async (ctx: Context) => {
-  const id = ctx.params.id as string
+  const adminUserId = ctx.params.id as string
+
   try {
-    if (!id || !Number(id)) {
+    const depts = ctx.state.dataPermission.depts as sPrismaDept[]
+
+    if (!adminUserId || !Number(adminUserId)) {
       ctx.body = formatResponse(null, 'id不能为空', 400)
       return
     }
-    const adminUser = await adminUserService.formDetail(Number(id))
+    const adminUser = await adminUserService.formDetail(
+      Number(adminUserId),
+      depts
+    )
     if (adminUser) {
       ctx.body = formatResponse(adminUser, '获取成功')
     } else {
@@ -149,9 +181,11 @@ export const getAdminUserForm = async (ctx: Context) => {
     ctx.body = formatResponse(error, '获取失败', 500)
   }
 }
+
 export const getAdminUser = async (ctx: Context) => {
-  const id = ctx.params.id as string
   try {
+    const id = ctx.params.id as string
+    const depts = ctx.state.dataPermission.depts as sPrismaDept[]
     if (!id || !Number(id)) {
       ctx.body = formatResponse(null, 'id不能为空', 400)
       return
@@ -172,22 +206,37 @@ export const getAdminUser = async (ctx: Context) => {
  * @returns
  */
 export const updateAdminUser = async (ctx: Context) => {
-  const id = ctx.params.id as string
+  const user = ctx.state.user as sJWT
+  const adminUserId = ctx.params.id as string
   try {
-    if (!id || !Number(id)) {
+    const depts = ctx.state.dataPermission.depts as sPrismaDept[]
+    if (!adminUserId || !Number(adminUserId)) {
       ctx.body = formatResponse(null, 'id不能为空', 400)
       return
     }
-    if (Number(id) === 1) {
+    if (Number(adminUserId) === 1) {
       ctx.body = formatResponse(null, '不能修改超级管理员', 400)
       return
     }
     const { name, password, email, roleId, deptId, nickname, status } = ctx
       .request.body as sAdminUserCreateParams
-    const repeat = await adminUserService.getById(Number(id))
+    const repeat = await adminUserService.getById(Number(adminUserId))
     if (!repeat) {
-      ctx.body = formatResponse(null, '用户已存在', 400)
+      ctx.body = formatResponse(null, '用户不存在', 400)
       return
+    } else {
+      if (user.id != ADMIN_USER_ID) {
+        if (repeat.deptId) {
+          const hasPerm = await hasDataPermission(ctx, repeat.deptId)
+          if (!hasPerm) {
+            ctx.body = formatResponse(null, '无权限修改此用户', 400)
+            return
+          }
+        } else {
+          ctx.body = formatResponse(null, '无权限修改此用户', 400)
+          return
+        }
+      }
     }
     if (password && !isPassword(password)) {
       ctx.body = formatResponse(null, '密码格式不正确', 400)
@@ -208,7 +257,7 @@ export const updateAdminUser = async (ctx: Context) => {
       return
     }
 
-    const result = await adminUserService.update(Number(id), {
+    const result = await adminUserService.update(Number(adminUserId), {
       name,
       nickname,
       email,
@@ -233,17 +282,28 @@ export const updateAdminUser = async (ctx: Context) => {
  * @returns
  */
 export const deleteAdminUser = async (ctx: Context) => {
-  const id = ctx.params.id as string
+  const user = ctx.state.user as sJWT
+  const adminUserId = ctx.params.id as string
+  const depts = ctx.state.dataPermission.depts as sPrismaDept[]
   try {
-    if (!id || !Number(id)) {
+    if (!adminUserId || !Number(adminUserId)) {
       ctx.body = formatResponse(null, 'id不能为空', 400)
       return
     }
-    if (Number(id) === 1) {
+    if (Number(adminUserId) === ADMIN_USER_ID) {
       ctx.body = formatResponse(null, '不能删除超级管理员', 400)
       return
     }
-    const result = await adminUserService.delete(Number(id))
+    if (user.id == Number(adminUserId)) {
+      ctx.body = formatResponse(null, '不能删除自己', 400)
+      return
+    }
+    const form = await adminUserService.formDetail(Number(adminUserId), depts)
+    if (!form) {
+      ctx.body = formatResponse(null, '用户不存在', 400)
+      return
+    }
+    const result = await adminUserService.delete(Number(adminUserId))
     if (result) {
       ctx.body = formatResponse(null, '删除成功')
     } else {

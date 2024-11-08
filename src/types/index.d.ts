@@ -1,4 +1,5 @@
 export interface sJWT {
   id: number
-  email: string
+  deptId: number | null
+  roleId: number | null
 }

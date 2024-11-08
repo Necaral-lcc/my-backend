@@ -28,7 +28,6 @@ import {
   updateDept,
   getDept,
   getDepts,
-  getDeptOptions,
   deleteDept,
   getDeptTree,
 } from '../controllerAdmin/dept-controller'
@@ -109,7 +108,7 @@ const list: IRoute[] = [
           {
             name: 'admin-user',
             path: '/adminUser',
-            middleware: [],
+            middleware: [dataPermission()],
             routes: [
               {
                 path: '',
@@ -185,23 +184,15 @@ const list: IRoute[] = [
           {
             name: 'dept',
             path: '/dept',
-            middleware: [],
+            middleware: [dataPermission()],
             routes: [
               {
                 path: '',
                 type: 'get',
-                middleware: [
-                  authPermission('system:dept:list'),
-                  dataPermission(),
-                ],
+                middleware: [authPermission('system:dept:list')],
                 action: getDepts,
               },
-              {
-                path: '/options',
-                type: 'get',
-                middleware: [authPermission('system:dept:option')],
-                action: getDeptOptions,
-              },
+
               {
                 path: '/tree',
                 type: 'get',
@@ -211,37 +202,25 @@ const list: IRoute[] = [
               {
                 path: '/:id',
                 type: 'get',
-                middleware: [
-                  authPermission('system:dept:edit'),
-                  dataPermission(),
-                ],
+                middleware: [authPermission('system:dept:edit')],
                 action: getDept,
               },
               {
                 path: '/:id',
                 type: 'put',
-                middleware: [
-                  authPermission('system:dept:edit'),
-                  dataPermission(),
-                ],
+                middleware: [authPermission('system:dept:edit')],
                 action: updateDept,
               },
               {
                 path: '/:id',
                 type: 'delete',
-                middleware: [
-                  authPermission('system:dept:del'),
-                  dataPermission(),
-                ],
+                middleware: [authPermission('system:dept:del')],
                 action: deleteDept,
               },
               {
                 path: '',
                 type: 'post',
-                middleware: [
-                  authPermission('system:dept:add'),
-                  dataPermission(),
-                ],
+                middleware: [authPermission('system:dept:add')],
                 action: createDept,
               },
             ],

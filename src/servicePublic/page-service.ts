@@ -5,6 +5,7 @@ import { Context } from 'koa'
 class PageService {
   isPage(ctx: Context): Promise<PageParams> {
     const { page, pageSize, ...other } = ctx.query
+    console.log('page:', page, 'pageSize:', pageSize, 'other:', other)
 
     return new Promise((resolve, reject) => {
       if (!(typeof page === 'string') || isNaN(Number(page))) {
