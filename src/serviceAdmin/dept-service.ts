@@ -118,6 +118,13 @@ class DeptService {
     })
     return dept
   }
+
+  async getDeptByParentIdWithAll(parentId: number | null) {
+    const list = await prisma.dept.findMany({
+      where: { parentId, deletedFlag: false },
+    })
+    return list
+  }
 }
 
 export default new DeptService()

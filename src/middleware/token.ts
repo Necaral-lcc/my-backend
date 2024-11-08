@@ -17,9 +17,15 @@ export const refreshToken =
       await next().then(() => {
         if (user) {
           const { id, email } = user
-          const token = createToken({ id, email }, time)
+          // 延长 token 过期时间
+          const token = createToken({ id, email }, time || JWT_EXPIRE_TIME)
+          // 设置 token 到 headers 中
           ctx.response.set(TOKEN_KEY, token)
-          ctx.response.set('token-expire-time', JWT_EXPIRE_TIME.toString())
+          // headers 中设置 token 过期时间
+          ctx.response.set(
+            'token-expire-time',
+            (time || JWT_EXPIRE_TIME).toString()
+          )
         }
       })
     } catch (err) {

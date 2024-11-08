@@ -1,5 +1,11 @@
 import { SERVER_URL } from '../config'
 
+/**
+ * 列表数据结构
+ * @interface sList
+ * @property {number} id 节点id
+ * @property {number | null} parentId 父节点id
+ */
 export interface sList {
   id: number
   parentId: number | null
@@ -60,4 +66,31 @@ export const deepListToTree = async <T extends sList>(
     })
   )
   return result
+}
+
+/**
+ * list结构深度遍历 返回结果是一维数组
+ * @param list  列表
+ * @param promiseFunc
+ * @returns
+ */
+export const deepTreeToList = async <T extends sList>(
+  list: T[],
+  promiseFunc: vPromiseFunc<T>
+): Promise<T[]> => {
+  const result = await Promise.all(
+    list.map(async (l) => {
+      const res = await promiseFunc(l.id)
+      const d: T = {
+        ...l,
+        parentId: l.parentId || 0,
+      }
+      if (!res.length) {
+        return [d]
+      }
+      const arr = await deepTreeToList<T>(res, promiseFunc)
+      return [d, ...arr]
+    })
+  )
+  return result.flat()
 }

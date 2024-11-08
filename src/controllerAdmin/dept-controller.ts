@@ -10,20 +10,29 @@ import { ITree, deepListToTree } from '../utils/tool'
 import PageService from '../servicePublic/page-service'
 import { sJWT } from '../types'
 import adminUserService from '../serviceAdmin/adminUser-service'
+import {
+  type sDataPermission,
+  hasDataPermission,
+} from '../middleware/permission'
+import redis from '../redis'
 
 /**
  * 用户创建部门
  * @param ctx
  */
 export const createDept = async (ctx: Context) => {
-  const { name, description, status, parentId } = ctx.request
-    .body as Prisma.DeptCreateInput & { parentId?: number }
-
-  if (!name) {
-    ctx.body = formatResponse(null, '部门名称不能为空', 400)
-    return
-  }
   try {
+    const { name, description, status, parentId } = ctx.request
+      .body as Prisma.DeptCreateInput & { parentId?: number }
+    if (!name) {
+      ctx.body = formatResponse(null, '部门名称不能为空', 400)
+      return
+    }
+    const dataPerm = await hasDataPermission(ctx, parentId)
+    if (!dataPerm) {
+      ctx.body = formatResponse({ parentId }, '无权限访问该部门', 403)
+      return
+    }
     const parent_id = parentId || undefined
     const dept = await deptService.create({
       name,
@@ -45,23 +54,28 @@ export const createDept = async (ctx: Context) => {
  * @param ctx
  */
 export const updateDept = async (ctx: Context) => {
-  const id = ctx.params.id as string
-  const { name, description, status, parentId } = ctx.request
-    .body as Prisma.DeptCreateInput & { parentId?: number }
-  if (!id || !isNumber(id)) {
-    ctx.body = formatResponse(null, '部门ID不能为空且必须为数字', 400)
-    return
-  }
-  if (!name) {
-    ctx.body = formatResponse(null, '部门名称不能为空', 400)
-    return
-  }
   try {
+    const id = ctx.params.id as string
+    const { name, description, status, parentId } = ctx.request
+      .body as Prisma.DeptCreateInput & { parentId?: number }
+    if (!id || !isNumber(id)) {
+      ctx.body = formatResponse(null, '部门ID不能为空且必须为数字', 400)
+      return
+    }
+    if (!name) {
+      ctx.body = formatResponse(null, '部门名称不能为空', 400)
+      return
+    }
+    const dataPerm = await hasDataPermission(ctx, parentId)
+    if (!dataPerm) {
+      ctx.body = formatResponse({ parentId }, '无权限访问该部门', 403)
+      return
+    }
     const dept = await deptService.update(Number(id), {
       name,
       description,
       status,
-      parentId,
+      parentId: parentId || null,
     })
     if (dept) {
       ctx.body = formatResponse(dept, '更新成功')
@@ -73,10 +87,31 @@ export const updateDept = async (ctx: Context) => {
   }
 }
 
+/**
+ * 获取部门树
+ * @param ctx
+ * @returns
+ */
 export const getDepts = async (ctx: Context) => {
-  const { parentId } = ctx.query as { parentId?: string }
   try {
-    const depts = await deptService.getDepts(Number(parentId) || null)
+    const { parentId } = ctx.query as { parentId?: string }
+    const dataPerm = await hasDataPermission(ctx, Number(parentId))
+    if (!dataPerm) {
+      ctx.body = formatResponse(null, '无权限访问该部门', 403)
+      return
+    }
+    const user = ctx.state.user as sJWT
+    let userDeptId: number | null = null
+    if (user.id !== 1) {
+      const adminUser = await adminUserService.getById(user.id)
+      if (!adminUser) {
+        ctx.body = formatResponse(null, '登录过期', 401)
+        return
+      }
+      userDeptId = adminUser.deptId
+    }
+
+    const depts = await deptService.getDepts(Number(parentId) || userDeptId)
     const tree = await deepListToTree(depts, deptService.getDepts)
     ctx.body = formatResponse(tree, '获取部门列表成功')
   } catch (e) {
@@ -140,7 +175,14 @@ export const deleteDept = async (ctx: Context) => {
 export const getDeptTree = async (ctx: Context) => {
   const { id } = ctx.state.user as sJWT
   let deptId: number | null = null
+  const redisKey = `adminUser:${id}:deptTree`
   try {
+    const list = await redis.get(redisKey)
+    if (list) {
+      console.log('redis缓存命中', list)
+      ctx.body = formatResponse(JSON.parse(list), '获取部门树成功')
+      return
+    }
     if (id !== 1) {
       const adminUser = await adminUserService.getById(id)
       if (adminUser) {
@@ -153,6 +195,7 @@ export const getDeptTree = async (ctx: Context) => {
             [dept],
             deptService.getDeptByParentId
           )
+          redis.set(redisKey, JSON.stringify(deptChildren))
           ctx.body = formatResponse(deptChildren, '获取部门树成功')
         } else {
           ctx.body = formatResponse(null, '所属部门不存在', 404)
