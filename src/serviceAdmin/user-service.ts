@@ -2,19 +2,19 @@ import { Prisma, PrismaClient } from '@prisma/client'
 import { Context } from 'koa'
 import { PageParams } from './type'
 import prisma from '../prisma'
+import { sPrismaDept } from '../middleware/permission'
+import { formatPageResponse } from '../utils'
 
 /**
  * Service用来处理逻辑，返回结果给Controller
  */
 
 class UserService {
-  login(email: string, password: string) {
+  findUnique(email: string) {
     return new Promise((resolve) => {
       const user = prisma.user.findUnique({
         where: {
           email,
-          password,
-          deletedFlag: false,
         },
         select: {
           id: true,
@@ -26,112 +26,92 @@ class UserService {
     })
   }
 
-  get(id: number) {
-    return new Promise((resolve, reject) => {
-      const user = prisma.user.findUnique({
-        where: {
+  create(data: Omit<Prisma.UserCreateInput, 'dept'> & { deptId?: number }) {
+    const user = prisma.user.create({
+      data,
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        deptId: true,
+      },
+    })
+    return user
+  }
+
+  getUserByIdUnderDepts(id: number, depts: sPrismaDept[] = []) {
+    const where: Prisma.UserWhereInput = {
+      AND: [
+        {
           id,
-          deletedFlag: false,
         },
-      })
-      resolve(user)
+      ],
+    }
+    if (depts.length > 0) {
+      where.OR = depts.map((dept) => ({
+        deptId: dept.id,
+      }))
+    }
+    const user = prisma.user.findFirst({
+      where,
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        deptId: true,
+      },
     })
+    return user
   }
 
-  getByEmail(email: string) {
-    return new Promise((resolve, reject) => {
-      const user = prisma.user.findUnique({
-        where: {
-          email,
-          deletedFlag: false,
-        },
-      })
-      resolve(user)
-    })
-  }
-
-  list(params: PageParams) {
-    const { pageSize, page, order = 'id', orderBy } = params
-    return new Promise((resolve, reject) => {
-      const users = prisma.user.findMany({
-        where: {
-          deletedFlag: false,
-        },
-        take: pageSize,
-        skip: (page - 1) * pageSize,
-        orderBy: {
-          [order.toString()]: orderBy as Prisma.SortOrder,
-        },
-      })
-      resolve(users)
-    })
-  }
-
-  create(email: string, password: string) {
-    return new Promise((resolve, reject) => {
-      const user = prisma.user.update({
-        where: {
-          email,
-          deletedFlag: true,
-        },
-        data: {
-          deletedFlag: false,
-          password,
-        },
-        select: {
-          id: true,
-          email: true,
-        },
-      })
-      resolve(user)
-    })
-  }
-
-  update(
+  async update(
     id: number,
-    { name, age, sex, address, phone, password }: Prisma.UserUpdateInput
+    data: Omit<Prisma.UserUpdateInput, 'dept'> & { deptId?: number }
   ) {
-    return new Promise((resolve, reject) => {
-      const user = prisma.user.update({
-        where: {
-          id,
-        },
-        data: {
-          name,
-          age,
-          sex,
-          address,
-          phone,
-          password,
-        },
-      })
-      resolve(user)
+    return prisma.user.update({
+      where: {
+        id,
+      },
+      data,
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        deptId: true,
+      },
     })
   }
 
-  delete(id: number) {
-    return new Promise((resolve, reject) => {
-      const user = prisma.user.delete({
-        where: {
-          id,
-        },
-      })
-      resolve(user)
+  async delete(id: number) {
+    return prisma.user.delete({
+      where: {
+        id,
+      },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        deptId: true,
+      },
     })
   }
 
-  deleteSelf(id: number) {
-    return new Promise((resolve, reject) => {
-      const user = prisma.user.update({
-        where: {
-          id,
-        },
-        data: {
-          deletedFlag: true,
-        },
-      })
-      resolve(user)
+  async getUserList(where: Prisma.UserWhereInput, pageParams: PageParams) {
+    const list = await prisma.user.findMany({
+      where,
+      skip: (pageParams.page - 1) * pageParams.pageSize,
+      take: pageParams.pageSize,
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        deptId: true,
+      },
     })
+    const total = await prisma.user.count({
+      where,
+    })
+    return formatPageResponse(list, pageParams.page, pageParams.pageSize, total)
   }
 }
 

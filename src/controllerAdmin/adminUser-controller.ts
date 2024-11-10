@@ -109,7 +109,7 @@ export const loginAdminUser = async (ctx: Context) => {
 export const getAdminUsers = async (ctx: Context) => {
   try {
     const user = ctx.state.user as sJWT
-    const dataPermission = ctx.state.dataPermission.depts as sPrismaDept[]
+    const depts = ctx.state.dataPermission.depts as sPrismaDept[]
     const pager = await PageService.isPage(ctx)
     const { page, pageSize, name, email } = pager
     if (Number(page) <= 0) {
@@ -140,7 +140,7 @@ export const getAdminUsers = async (ctx: Context) => {
           name,
           email,
         },
-        dataPermission
+        depts
       )
       if (list) {
         ctx.body = formatResponse(list, '获取成功')
@@ -184,13 +184,17 @@ export const getAdminUserForm = async (ctx: Context) => {
 
 export const getAdminUser = async (ctx: Context) => {
   try {
-    const id = ctx.params.id as string
+    const user = ctx.state.user as sJWT
+    const adminUserId = ctx.params.id as string
     const depts = ctx.state.dataPermission.depts as sPrismaDept[]
-    if (!id || !Number(id)) {
+    if (!adminUserId || !Number(adminUserId)) {
       ctx.body = formatResponse(null, 'id不能为空', 400)
       return
     }
-    const adminUser = await adminUserService.detail(Number(id))
+    const adminUser = await adminUserService.formDetail(
+      Number(adminUserId),
+      depts
+    )
     if (adminUser) {
       ctx.body = formatResponse(adminUser, '获取成功')
     } else {
@@ -209,13 +213,15 @@ export const updateAdminUser = async (ctx: Context) => {
   const user = ctx.state.user as sJWT
   const adminUserId = ctx.params.id as string
   try {
-    const depts = ctx.state.dataPermission.depts as sPrismaDept[]
     if (!adminUserId || !Number(adminUserId)) {
       ctx.body = formatResponse(null, 'id不能为空', 400)
       return
     }
-    if (Number(adminUserId) === 1) {
+    if (user.id != ADMIN_USER_ID && Number(adminUserId) === 1) {
       ctx.body = formatResponse(null, '不能修改超级管理员', 400)
+      return
+    } else if (user.id != ADMIN_USER_ID && Number(adminUserId) === user.id) {
+      ctx.body = formatResponse(null, '不能修改自己', 400)
       return
     }
     const { name, password, email, roleId, deptId, nickname, status } = ctx
@@ -246,7 +252,6 @@ export const updateAdminUser = async (ctx: Context) => {
       ctx.body = formatResponse(null, '邮箱格式不正确', 400)
       return
     }
-
     let hashPasswordStr = undefined
     try {
       if (password) {
@@ -256,7 +261,6 @@ export const updateAdminUser = async (ctx: Context) => {
       ctx.body = formatResponse(null, '密码格式错误', 500)
       return
     }
-
     const result = await adminUserService.update(Number(adminUserId), {
       name,
       nickname,
@@ -287,7 +291,7 @@ export const deleteAdminUser = async (ctx: Context) => {
   const depts = ctx.state.dataPermission.depts as sPrismaDept[]
   try {
     if (!adminUserId || !Number(adminUserId)) {
-      ctx.body = formatResponse(null, 'id不能为空', 400)
+      ctx.body = formatResponse(null, '请输入合法的id', 400)
       return
     }
     if (Number(adminUserId) === ADMIN_USER_ID) {
@@ -375,5 +379,52 @@ export const getAdminUserInfo = async (ctx: Context) => {
     ctx.body = formatResponse(user, '获取成功')
   } catch (error) {
     ctx.body = formatResponse(error, '获取失败', 500)
+  }
+}
+
+/**
+ * 管理员更新自己信息
+ * @param ctx
+ * @returns
+ */
+export const updateAdminUserSelf = async (ctx: Context) => {
+  try {
+    const { id } = ctx.state.user as sJWT
+
+    const { name, password, email, nickname, avatar } = ctx.request.body as {
+      name?: string
+      password?: string
+      email?: string
+      nickname?: string
+      avatar?: string
+    }
+
+    if (password && !isPassword(password)) {
+      ctx.body = formatResponse(null, '密码格式不正确', 400)
+      return
+    }
+    if (email && !isEmail(email)) {
+      ctx.body = formatResponse(null, '邮箱格式不正确', 400)
+      return
+    }
+
+    let hashPasswordStr: string | undefined = undefined
+    if (password) {
+      hashPasswordStr = await hashPassword(password)
+    }
+    const user = await adminUserService.update(id, {
+      name,
+      password: hashPasswordStr,
+      email,
+      nickname,
+      avatar,
+    })
+    if (user) {
+      ctx.body = formatResponse(null, '更新成功')
+    } else {
+      ctx.body = formatResponse(null, '更新失败', 500)
+    }
+  } catch (error) {
+    ctx.body = formatResponse(error, '更新失败', 500)
   }
 }

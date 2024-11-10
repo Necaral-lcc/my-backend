@@ -1,3 +1,4 @@
+import { type sPrismaDept } from '../middleware/permission'
 /**
  * Controller用于接受数据、返回数据给前端
  */
@@ -5,102 +6,193 @@ import { Context } from 'koa'
 import userService from '../serviceAdmin/user-service'
 import { Prisma } from '@prisma/client'
 import { isEmail, isPassword, formatResponse } from '../utils'
+import { sJWT } from '../types'
+import { hashPassword } from '../utils/bcrypt'
+import { hasDataPermission } from '../middleware/permission'
+import { ADMIN_USER_ID } from '../config'
+import PageService from '../servicePublic/page-service'
 
 /**
- * 返回指定用户信息
+ * 创建用户
  * @param ctx
- */
-export const getUser = async (ctx: Context) => {
-  const { id } = ctx.params
-  ctx.response.type = 'application/json'
-
-  if (id > 0) {
-    const res = await userService.get(Number(id))
-    if (res) {
-      ctx.body = formatResponse(res)
-    } else {
-      ctx.body = formatResponse(null, '用户不存在', 404)
-    }
-  } else {
-    ctx.body = formatResponse(null, 'id不能为空', 400)
-  }
-}
-
-/**
- * 返回用户列表
- * @param ctx
- */
-export const getUsers = async (ctx: Context) => {
-  const page = Number(ctx.query.page) || 1
-  const pageSize = Number(ctx.query.pageSize) || 10
-  const order = (ctx.query.order || 'id') as string
-  const orderBy = (ctx.query.orderBy || 'desc') as Prisma.SortOrder
-  const res = await userService.list({ page, pageSize, order, orderBy })
-  ctx.body = formatResponse(res)
-}
-
-/**
- * 接收post请求，并创建用户
- * 如：/info?name=jack&age=32
- * ctx.query => { name: 'jack', age: '32' }
- * @param ctx
+ * @returns
  */
 export const createUser = async (ctx: Context) => {
-  const { email, password } = ctx.request.body as {
-    email: string
-    password: string
+  try {
+    const adminUser = ctx.state.user as sJWT
+    const { email, password, name, deptId } = ctx.request
+      .body as Prisma.UserCreateInput & { deptId?: number }
+    if (!email) {
+      ctx.body = formatResponse(null, '邮箱不能为空', 400)
+      return
+    }
+    if (!isEmail(email)) {
+      ctx.body = formatResponse(null, '邮箱格式不正确', 400)
+      return
+    }
+    if (!password || !isPassword(password)) {
+      ctx.body = formatResponse(null, '密码格式不正确', 400)
+      return
+    }
+    if (adminUser.id !== ADMIN_USER_ID && deptId) {
+      const hasPerm = await hasDataPermission(ctx, deptId)
+      if (!hasPerm) {
+        ctx.body = formatResponse({ deptId }, '无权限分配此部门给用户', 403)
+        return
+      }
+    }
+    const repeatUser = await userService.findUnique(email)
+    if (repeatUser) {
+      ctx.body = formatResponse(null, '邮箱已存在', 400)
+      return
+    }
+    let hashPasswordStr: string | undefined = undefined
+    try {
+      hashPasswordStr = await hashPassword(password)
+    } catch (err) {
+      ctx.body = formatResponse(err, '密码加密错误', 400)
+      return
+    }
+    const newUser = await userService.create({
+      email,
+      password: hashPasswordStr,
+      name,
+      deptId,
+    })
+    ctx.body = formatResponse(newUser, '创建成功')
+  } catch (err) {
+    ctx.body = formatResponse(err, '创建错误', 400)
   }
-  if (!email) ctx.throw(400, '邮箱不能为空')
-  if (!isEmail(email)) ctx.throw(400, '邮箱格式不正确')
-  if (!password) ctx.throw(400, '密码不能为空')
-  if (password.length < 6) ctx.throw(400, '密码长度不能少于6位')
-  if (password.length > 20) ctx.throw(400, '密码长度不能超过20位')
-  if (!isPassword(password)) ctx.throw(400, '密码格式不正确')
-  const user = await userService.getByEmail(email)
-  if (user) {
-    ctx.body = formatResponse(null, '邮箱已存在', 400)
-    return
-  }
-  const res = await userService.create(email, password)
-  ctx.response.type = 'application/json'
-  ctx.body = formatResponse(res, '创建成功', 200)
 }
 
-/**
- * 接收put请求，并修改对应用户
- * @param ctx
- */
 export const updateUser = async (ctx: Context) => {
-  const { id } = ctx.params
-  if (!id) ctx.body = formatResponse(null, 'id不能为空', 400)
-  const data = ctx.request.body as Prisma.UserUpdateInput
-  if (!data || Object.keys(data).length === 0) ctx.throw(400, '数据不能为空')
-  const res = await userService.update(id, data)
-  ctx.body = formatResponse(res, '修改成功', 200)
-}
-
-/**
- * 接收delete请求，并删除对应用户
- * @param ctx
- */
-export const deleteUser = async (ctx: Context) => {
-  const { id } = ctx.params
-  if (!id) ctx.body = formatResponse(null, 'id不能为空', 400)
-  if (id > 0) {
-    const user = await userService.get(Number(id))
-    if (!user) {
+  try {
+    const adminUser = ctx.state.user as sJWT
+    const depts = ctx.state.dataPermission.depts as sPrismaDept[]
+    const { id } = ctx.params
+    const { email, password, name, deptId } = ctx.request.body as {
+      email?: string
+      password?: string
+      name?: string
+      deptId?: number
+    }
+    if (email) {
+      const repeatUser = await userService.findUnique(email)
+      if (repeatUser) {
+        ctx.body = formatResponse(null, '邮箱已存在', 400)
+        return
+      }
+    }
+    if (password) {
+      if (!isPassword(password)) {
+        ctx.body = formatResponse(null, '密码格式不正确', 400)
+        return
+      }
+    }
+    const userExist = await userService.getUserByIdUnderDepts(id, depts)
+    if (!userExist) {
       ctx.body = formatResponse(null, '用户不存在', 404)
       return
     }
-    const res = await userService.delete(id)
-    ctx.body = formatResponse(null, '删除成功', 200)
-  } else {
-    ctx.body = formatResponse(null, 'id非法', 400)
+    if (adminUser.id !== ADMIN_USER_ID) {
+      if (userExist.deptId) {
+        const hasPerm = await hasDataPermission(ctx, userExist.deptId)
+        if (!hasPerm) {
+          ctx.body = formatResponse({ deptId }, '无权限修改此用户', 403)
+          return
+        }
+      }
+      if (deptId) {
+        const hasPerm = await hasDataPermission(ctx, deptId)
+        if (!hasPerm) {
+          ctx.body = formatResponse({ deptId }, '无权限分配此部门给用户', 403)
+          return
+        }
+      }
+    }
+    let hashPasswordStr: string | undefined = undefined
+    if (password) {
+      try {
+        hashPasswordStr = await hashPassword(password)
+      } catch (err) {
+        ctx.body = formatResponse(err, '密码加密错误', 400)
+        return
+      }
+    }
+    const updatedUser = await userService.update(id, {
+      email,
+      password: hashPasswordStr,
+      name,
+      deptId,
+    })
+    ctx.body = formatResponse(updatedUser, '更新成功')
+  } catch (err) {
+    ctx.body = formatResponse(err, '更新错误', 400)
   }
 }
 
-export const deleteSelf = async (ctx: Context) => {
-  const { id } = ctx.state.user
-  const res = await userService.deleteSelf(id)
-  ctx.body = formatResponse(null, '注销成功', 200)
+export const deleteUser = async (ctx: Context) => {
+  try {
+    const adminUser = ctx.state.user as sJWT
+    const depts = ctx.state.dataPermission.depts as sPrismaDept[]
+    const { id } = ctx.params
+    const userExist = await userService.getUserByIdUnderDepts(id, depts)
+    if (!userExist) {
+      ctx.body = formatResponse(null, '用户不存在', 404)
+      return
+    }
+    if (adminUser.id !== ADMIN_USER_ID) {
+      if (userExist.deptId) {
+        const hasPerm = await hasDataPermission(ctx, userExist.deptId)
+        if (!hasPerm) {
+          ctx.body = formatResponse(
+            { id: userExist.id },
+            '无权限删除此用户',
+            403
+          )
+          return
+        }
+      }
+    }
+    await userService.delete(id)
+    ctx.body = formatResponse(null, '删除成功')
+  } catch (err) {
+    ctx.body = formatResponse(err, '删除错误', 400)
+  }
+}
+
+export const getUserList = async (ctx: Context) => {
+  try {
+    const adminUser = ctx.state.user as sJWT
+    const depts = ctx.state.dataPermission.depts as sPrismaDept[]
+    const pager = await PageService.isPage(ctx)
+    const { page, pageSize, name, email, deptId } = pager
+    if (adminUser.id !== ADMIN_USER_ID) {
+      if (deptId) {
+        const hasPerm = await hasDataPermission(ctx, deptId)
+        if (!hasPerm) {
+          ctx.body = formatResponse({ deptId }, '无权限获取此部门用户', 403)
+          return
+        }
+      }
+    }
+    const where = {
+      AND: [],
+    } as Prisma.UserWhereInput
+    if (name) {
+      where.AND = { ...where.AND, name: { contains: name } }
+    }
+    if (email) {
+      where.AND = { ...where.AND, email: { contains: email } }
+    }
+    if (adminUser.id !== ADMIN_USER_ID) {
+      if (deptId) {
+        where.OR = depts.map((dept) => ({ deptId: dept.id }))
+      }
+    }
+    const userList = await userService.getUserList(where, { page, pageSize })
+    ctx.body = formatResponse(userList, '获取成功')
+  } catch (err) {
+    ctx.body = formatResponse(err, '获取错误', 400)
+  }
 }

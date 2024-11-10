@@ -130,6 +130,17 @@ class DeptService {
     })
     return list
   }
+
+  updateDeptUnderUser(
+    userId: number,
+    deptId: number,
+    data: Prisma.DeptUpdateInput
+  ) {
+    return prisma.dept.update({
+      where: { id: deptId, users: { some: { id: userId } } },
+      data,
+    })
+  }
 }
 
 export default new DeptService()

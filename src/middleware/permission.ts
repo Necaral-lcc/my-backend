@@ -20,7 +20,7 @@ export interface sPrismaDept {
 
 /**
  * 接口权限验证中间件
- * @description 验证用户是否有权限,id为1的管理员拥有所有权限
+ * @description 验证用户是否有权限,id为1的管理员拥有所有权限，redis缓存用户接口权限
  * @param per 权限
  * @param ctx Koa.Context
  * @param next Koa.Next
@@ -35,7 +35,7 @@ export const authPermission =
       await next()
       return
     }
-    const redisKey = `redis:${id}:permission:${per}`
+    const redisKey = `redis:${id}:authPermission:${per}`
     const redisValue = await redis.get(redisKey)
     if (redisValue) {
       // 缓存中有权限
@@ -63,7 +63,7 @@ export const authPermission =
   }
 /**
  * 数据权限验证中间件
- * @description 验证用户是否有数据权限,id为1的管理员拥有所有数据权限，redis缓存用户部门权限
+ * @description 验证用户是否有数据权限,id为1的管理员拥有所有数据权限，redis缓存用户数据权限
  * @param ctx Koa.Context
  * @param next Koa.Next
  * @returns
@@ -71,7 +71,7 @@ export const authPermission =
 export const dataPermission =
   () => async (ctx: Koa.Context, next: Koa.Next) => {
     const { id, deptId } = ctx.state.user as sJWT
-    const redisKey = `redis:${id}:data:deptIds`
+    const redisKey = `redis:${id}:dataPermission`
 
     // 管理员拥有所有数据权限
     if (id === ADMIN_USER_ID) {
@@ -83,7 +83,7 @@ export const dataPermission =
       return
     } else {
       if (!deptId) {
-        ctx.body = formatResponse(null, '未分配部门', 500)
+        ctx.body = formatResponse(null, '未分配部门,请重新登录', 401)
         return
       }
       const redisValue = await redis.get(redisKey)
@@ -97,7 +97,11 @@ export const dataPermission =
 
       const dept = await deptService.getDeptById(deptId)
       if (!dept) {
-        ctx.body = formatResponse(null, '部门不存在', 500)
+        ctx.body = formatResponse(
+          null,
+          '分配的部门不存在或者已删除，清联系管理员',
+          500
+        )
         return
       }
       const depts = await deepTreeToList(

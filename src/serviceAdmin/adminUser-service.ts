@@ -18,6 +18,7 @@ export interface sAdminUserCreateParams {
   roleId?: number
   deptId?: number
   status?: boolean
+  avatar?: string
 }
 
 type sAdminUserFind = Prisma.Prisma__AdminUserClient<
@@ -160,26 +161,6 @@ class AdminUserService {
     }
   }
 
-  async detail(id: number) {
-    const adminUser = await prisma.adminUser.findUnique({
-      where: {
-        id,
-        deletedFlag: false,
-      },
-      select: {
-        id: true,
-        name: true,
-        nickname: true,
-        email: true,
-        status: true,
-        roleId: true,
-        deptId: true,
-        createdAt: true,
-        updatedAt: true,
-      },
-    })
-    return adminUser
-  }
   async formDetail(id: number, depts: sPrismaDept[] = []) {
     const where: Prisma.AdminUserWhereInput = {
       AND: [
@@ -281,6 +262,7 @@ class AdminUserService {
         name: true,
         nickname: true,
         email: true,
+        avatar: true,
       },
     })
     return adminUser

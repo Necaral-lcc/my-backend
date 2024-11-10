@@ -19,7 +19,10 @@ export const isEmail = (email: string) => {
  * @param password 密码
  * @returns boolean
  */
-export const isPassword = (password: string) => {
+export const isPassword = (password?: string | null) => {
+  if (!password) {
+    return false
+  }
   const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/
   return regex.test(password)
 }
