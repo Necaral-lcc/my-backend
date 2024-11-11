@@ -124,29 +124,43 @@ export const updateDept = async (ctx: Context) => {
  */
 export const getDepts = async (ctx: Context) => {
   try {
-    const { id, deptId } = ctx.state.user as sJWT
-
+    const adminUser = ctx.state.user as sJWT
     const { parentId } = ctx.query as { parentId?: string }
-    if (id !== ADMIN_USER_ID) {
+    let targetDeptId: number | null = adminUser.deptId
+    let tree: any[] = []
+    if (adminUser.id !== ADMIN_USER_ID) {
       if (parentId) {
         const dataPerm = await hasDataPermission(ctx, Number(parentId))
         if (!dataPerm) {
           ctx.body = formatResponse(null, '无权限访问该部门', 403)
           return
         }
+        targetDeptId = Number(parentId)
+      }
+      if (targetDeptId) {
+        const dept = await deptService.getDept(targetDeptId)
+        if (dept) {
+          tree = await deepListToTree([dept], deptService.getDepts)
+        } else {
+          ctx.body = formatResponse(null, '所属部门不存在', 404)
+          return
+        }
+      }
+    } else {
+      if (parentId) {
+        const dept = await deptService.getDept(Number(parentId))
+        if (dept) {
+          tree = await deepListToTree([dept], deptService.getDepts)
+        } else {
+          ctx.body = formatResponse(null, '所属部门不存在', 404)
+          return
+        }
+      } else {
+        const depts = await deptService.getDepts(Number(parentId) || null)
+        tree = await deepListToTree(depts, deptService.getDepts)
       }
     }
-    const targetDeptId = parentId ? Number(parentId) : deptId
-    if (!targetDeptId) {
-      ctx.body = formatResponse(null, '父部门不能为空', 400)
-      return
-    }
-    const dept = await deptService.getDept(targetDeptId)
-    if (!dept) {
-      ctx.body = formatResponse(null, '部门不存在', 404)
-      return
-    }
-    const tree = await deepListToTree([dept], deptService.getDepts)
+
     ctx.body = formatResponse(tree, '获取部门列表成功')
   } catch (e) {
     ctx.body = formatResponse(e, '获取部门列表失败', 500)
