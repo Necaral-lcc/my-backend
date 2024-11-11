@@ -7,7 +7,7 @@ import { formatResponse } from '../utils'
 import { Worker } from 'cluster'
 
 const options: IRateLimiterOptions = {
-  points: 10, // 6 points
+  points: 20, // 6 points
   duration: 1, // Per second
 }
 
@@ -24,7 +24,6 @@ export const rateLimit =
     try {
       const rateLimiterRes = await rateLimiter.consume(key)
       if (rateLimiterRes.remainingPoints === 0) {
-        ctx.status = 429
         ctx.body = formatResponse(null, '请求太频繁，请稍后再试。', 429)
         return
       }
@@ -41,7 +40,6 @@ export const rateLimit =
       }
       await next()
     } catch (e) {
-      ctx.status = 429
       ctx.body = formatResponse(e, '请求太频繁，请稍后再试。', 429)
       return
     }

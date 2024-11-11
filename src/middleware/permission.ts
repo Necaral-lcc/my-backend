@@ -70,9 +70,14 @@ export const authPermission =
  */
 export const dataPermission =
   () => async (ctx: Koa.Context, next: Koa.Next) => {
-    const { id, deptId } = ctx.state.user as sJWT
+    const adminUser = ctx.state.user as sJWT
+    // 不存在登录信息的接口跳过验证
+    if (!adminUser) {
+      await next()
+      return
+    }
+    const { id, deptId } = adminUser
     const redisKey = `redis:${id}:dataPermission`
-
     // 管理员拥有所有数据权限
     if (id === ADMIN_USER_ID) {
       // 管理员拥有所有数据权限,任何数据都可以访问

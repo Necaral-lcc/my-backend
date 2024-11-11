@@ -105,7 +105,14 @@ class UserService {
         id: true,
         email: true,
         name: true,
-        deptId: true,
+        createdAt: true,
+        updatedAt: true,
+        dept: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
       },
     })
     const total = await prisma.user.count({

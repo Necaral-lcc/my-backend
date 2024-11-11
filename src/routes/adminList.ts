@@ -38,6 +38,13 @@ import { PORT, ADMIN_SECRET_KEY, APP_SECRET_KEY, TOKEN_KEY } from '../config'
 import { rateLimit } from '../middleware/rateLimit'
 import { refreshToken } from '../middleware/token'
 import { cache } from '../middleware/cache'
+import {
+  createUser,
+  updateUser,
+  deleteUser,
+  getUserList,
+  getUserDetail,
+} from '../controllerAdmin/user-controller'
 
 const list: IRoute[] = [
   {
@@ -52,12 +59,14 @@ const list: IRoute[] = [
       }),
       refreshToken(),
       rateLimit(),
+      cache(),
+      dataPermission(),
     ],
     routes: [
       {
         name: 'system',
         path: '/system',
-        middleware: [cache()],
+        middleware: [],
         routes: [
           // 菜单
           {
@@ -87,7 +96,7 @@ const list: IRoute[] = [
               {
                 path: '/:id',
                 type: 'get',
-                middleware: [authPermission('system:menu:edit')],
+                middleware: [authPermission('system:menu:detail')],
                 action: getMenu,
               },
               {
@@ -108,7 +117,7 @@ const list: IRoute[] = [
           {
             name: 'admin-user',
             path: '/adminUser',
-            middleware: [dataPermission()],
+            middleware: [],
             routes: [
               {
                 path: '',
@@ -119,7 +128,7 @@ const list: IRoute[] = [
               {
                 path: '/:id',
                 type: 'get',
-                middleware: [authPermission('system:admin:edit')],
+                middleware: [authPermission('system:admin:detail')],
                 action: getAdminUserForm,
               },
               {
@@ -157,7 +166,7 @@ const list: IRoute[] = [
               {
                 path: '/:id',
                 type: 'get',
-                middleware: [authPermission('system:role:edit')],
+                middleware: [authPermission('system:role:detail')],
                 action: getRole,
               },
               {
@@ -184,7 +193,7 @@ const list: IRoute[] = [
           {
             name: 'dept',
             path: '/dept',
-            middleware: [dataPermission()],
+            middleware: [],
             routes: [
               {
                 path: '',
@@ -202,7 +211,7 @@ const list: IRoute[] = [
               {
                 path: '/:id',
                 type: 'get',
-                middleware: [authPermission('system:dept:edit')],
+                middleware: [authPermission('system:dept:detail')],
                 action: getDept,
               },
               {
@@ -222,6 +231,50 @@ const list: IRoute[] = [
                 type: 'post',
                 middleware: [authPermission('system:dept:add')],
                 action: createDept,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: 'blog',
+        path: '/blog',
+        middleware: [],
+        routes: [
+          {
+            name: 'blogUser',
+            path: '/user',
+            middleware: [],
+            routes: [
+              {
+                path: '',
+                type: 'get',
+                middleware: [authPermission('blog:user:list')],
+                action: getUserList,
+              },
+              {
+                path: '/:id',
+                type: 'get',
+                middleware: [authPermission('blog:user:detail')],
+                action: getUserDetail,
+              },
+              {
+                path: '',
+                type: 'post',
+                middleware: [authPermission('blog:user:add')],
+                action: createUser,
+              },
+              {
+                path: '/:id',
+                type: 'put',
+                middleware: [authPermission('blog:user:edit')],
+                action: updateUser,
+              },
+              {
+                path: '/:id',
+                type: 'delete',
+                middleware: [authPermission('blog:user:del')],
+                action: deleteUser,
               },
             ],
           },

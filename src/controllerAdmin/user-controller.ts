@@ -5,7 +5,7 @@ import { type sPrismaDept } from '../middleware/permission'
 import { Context } from 'koa'
 import userService from '../serviceAdmin/user-service'
 import { Prisma } from '@prisma/client'
-import { isEmail, isPassword, formatResponse } from '../utils'
+import { isEmail, isPassword, formatResponse, isNumber } from '../utils'
 import { sJWT } from '../types'
 import { hashPassword } from '../utils/bcrypt'
 import { hasDataPermission } from '../middleware/permission'
@@ -64,7 +64,11 @@ export const createUser = async (ctx: Context) => {
     ctx.body = formatResponse(err, '创建错误', 400)
   }
 }
-
+/**
+ * 更新用户信息
+ * @param ctx
+ * @returns
+ */
 export const updateUser = async (ctx: Context) => {
   try {
     const adminUser = ctx.state.user as sJWT
@@ -89,6 +93,7 @@ export const updateUser = async (ctx: Context) => {
         return
       }
     }
+
     const userExist = await userService.getUserByIdUnderDepts(id, depts)
     if (!userExist) {
       ctx.body = formatResponse(null, '用户不存在', 404)
@@ -130,12 +135,17 @@ export const updateUser = async (ctx: Context) => {
     ctx.body = formatResponse(err, '更新错误', 400)
   }
 }
-
+/**
+ * 删除用户
+ * @param ctx
+ * @returns
+ */
 export const deleteUser = async (ctx: Context) => {
   try {
     const adminUser = ctx.state.user as sJWT
-    const depts = ctx.state.dataPermission.depts as sPrismaDept[]
+    let depts = ctx.state.dataPermission.depts as sPrismaDept[]
     const { id } = ctx.params
+
     const userExist = await userService.getUserByIdUnderDepts(id, depts)
     if (!userExist) {
       ctx.body = formatResponse(null, '用户不存在', 404)
@@ -161,6 +171,11 @@ export const deleteUser = async (ctx: Context) => {
   }
 }
 
+/**
+ * 获取用户列表
+ * @param ctx
+ * @returns
+ */
 export const getUserList = async (ctx: Context) => {
   try {
     const adminUser = ctx.state.user as sJWT
@@ -192,6 +207,33 @@ export const getUserList = async (ctx: Context) => {
     }
     const userList = await userService.getUserList(where, { page, pageSize })
     ctx.body = formatResponse(userList, '获取成功')
+  } catch (err) {
+    ctx.body = formatResponse(err, '获取错误', 400)
+  }
+}
+
+/**
+ * 获取用户详情
+ * @param ctx
+ * @returns
+ */
+export const getUserDetail = async (ctx: Context) => {
+  try {
+    const adminUser = ctx.state.user as sJWT
+    const depts = ctx.state.dataPermission.depts as sPrismaDept[]
+    const id = ctx.params.id as string
+    console.log('user.id', id)
+    const intInt = parseInt(id)
+    if (!intInt) {
+      ctx.body = formatResponse(null, '参数错误', 400)
+      return
+    }
+    const userExist = await userService.getUserByIdUnderDepts(intInt, depts)
+    if (!userExist) {
+      ctx.body = formatResponse(null, '用户不存在', 404)
+      return
+    }
+    ctx.body = formatResponse(userExist, '获取成功')
   } catch (err) {
     ctx.body = formatResponse(err, '获取错误', 400)
   }

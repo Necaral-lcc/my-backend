@@ -11,7 +11,12 @@ import redis from '../redis'
  */
 export const cache =
   (time?: number) => async (ctx: Koa.Context, next: Koa.Next) => {
-    const id = ctx.state.user.id as number
+    const user = ctx.state.user as sJWT
+    if (!user) {
+      await next()
+      return
+    }
+    const id = user.id
     const redisKeyPrefix = `redis:${id}:GET:`
     // 缓存GET请求
     if (ctx.method === 'GET' || ctx.method === 'get') {
