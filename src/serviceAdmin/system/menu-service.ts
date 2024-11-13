@@ -1,5 +1,5 @@
 import { Prisma, PrismaClient } from '@prisma/client'
-import prisma from '../prisma'
+import prisma from '@src/prisma'
 
 /**
  * Service用来处理逻辑，返回结果给Controller

@@ -69,7 +69,7 @@ const uploadPromise = (file: multer.File) => {
   return new Promise<sUploadFile>(async (resolve, reject) => {
     const filePath = path.join(
       __dirname,
-      '../../uploads/files/',
+      '@src/uploads/files/',
       file.originalname
     )
     fs.writeFile(filePath, file.buffer, (err) => {
@@ -93,7 +93,7 @@ export const readFiles = async (ctx: Context) => {
   try {
     const { filename, type } = ctx.params
     console.log(filename, type)
-    let filePath = path.join(__dirname, `../../uploads/`, type, filename)
+    let filePath = path.join(__dirname, `@src/uploads/`, type, filename)
     console.log('filePath', filePath)
     let file = fs.readFileSync(filePath)
     let mineType = mime.lookup(filePath) || 'text/plain'

@@ -1,11 +1,11 @@
 import { deepTreeToList } from './../utils/tool'
 import { sJWT } from '../types'
 import * as Koa from 'koa'
-import AdminUserService from '../serviceAdmin/adminUser-service'
+import AdminUserService from '../serviceAdmin/system/adminUser-service'
 import { formatResponse, isNumber } from '../utils'
 import redis from '../redis'
-import adminUserService from '../serviceAdmin/adminUser-service'
-import deptService from '../serviceAdmin/dept-service'
+import adminUserService from '../serviceAdmin/system/adminUser-service'
+import deptService from '../serviceAdmin/system/dept-service'
 import { ADMIN_USER_ID } from '../config'
 
 export interface sDataPermission {

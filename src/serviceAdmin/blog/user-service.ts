@@ -1,29 +1,27 @@
 import { Prisma, PrismaClient } from '@prisma/client'
 import { Context } from 'koa'
-import { PageParams } from './type'
-import prisma from '../prisma'
-import { sPrismaDept } from '../middleware/permission'
-import { formatPageResponse } from '../utils'
+import { PageParams } from '../type'
+import prisma from '@src/prisma'
+import { sPrismaDept } from '@src/middleware/permission'
+import { formatPageResponse } from '@src/utils'
 
 /**
  * Service用来处理逻辑，返回结果给Controller
  */
 
 class UserService {
-  findUnique(email: string) {
-    return new Promise((resolve) => {
-      const user = prisma.user.findUnique({
-        where: {
-          email,
-        },
-        select: {
-          id: true,
-          email: true,
-          name: true,
-        },
-      })
-      resolve(user)
+  async findUnique(email: string) {
+    const user = prisma.user.findUnique({
+      where: {
+        email,
+      },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+      },
     })
+    return user
   }
 
   create(data: Omit<Prisma.UserCreateInput, 'dept'> & { deptId?: number }) {
@@ -119,6 +117,17 @@ class UserService {
       where,
     })
     return formatPageResponse(list, pageParams.page, pageParams.pageSize, total)
+  }
+
+  async getUserEmailRepeat(params: Prisma.UserWhereUniqueInput) {
+    return prisma.user.findFirst({
+      where: {
+        id: {
+          not: params.id,
+        },
+        email: params.email,
+      },
+    })
   }
 }
 

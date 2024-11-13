@@ -1,6 +1,7 @@
 import * as Koa from 'koa'
 import * as Router from '@koa/router'
 import * as bodyParser from 'koa-bodyparser'
+import 'module-alias/register'
 import { PORT, WEBSOCKET_PORT } from './config'
 import routesAction from './routes'
 import { WebSocketService } from './websocket/websocket-service'

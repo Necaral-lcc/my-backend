@@ -2,25 +2,25 @@
  * Controller用于接受数据、返回数据给前端
  */
 import { Context } from 'koa'
-import { isEmail, isPassword, formatResponse } from '../utils'
+import { isEmail, isPassword, formatResponse } from '@src/utils/index.ts'
 import * as jwt from 'jsonwebtoken'
 import {
   ADMIN_SECRET_KEY,
   TOKEN_KEY,
   JWT_EXPIRE_TIME,
   ADMIN_USER_ID,
-} from '../config'
-import { createToken } from '../utils/token'
+} from '@src/config.ts'
+import { createToken } from '@src/utils/token.ts'
 import adminUserService, {
   sAdminUserCreateParams,
-} from '../serviceAdmin/adminUser-service'
-import { hashPassword, comparePassword } from '../utils/bcrypt'
-import { sJWT } from '../types'
-import { sAdminUserInfo } from './type'
-import menuService from '../serviceAdmin/menu-service.ts'
-import PageService from '../servicePublic/page-service.ts'
-import { listToTree } from '../utils/tool'
-import { hasDataPermission, sPrismaDept } from '../middleware/permission.ts'
+} from '@src/serviceAdmin/system/adminUser-service.ts'
+import { hashPassword, comparePassword } from '@src/utils/bcrypt.ts'
+import { sJWT } from '@src/types/index'
+import { sAdminUserInfo } from '../type'
+import menuService from '@src/serviceAdmin/system/menu-service.ts'
+import PageService from '@src/servicePublic/page-service.ts'
+import { listToTree } from '@src/utils/tool.ts'
+import { hasDataPermission, sPrismaDept } from '@src/middleware/permission.ts'
 
 /**
  * 管理员创建

@@ -2,20 +2,21 @@
  * Controller用于接受数据、返回数据给前端
  */
 import { Context } from 'koa'
-import deptService, { type IDeptList } from '../serviceAdmin/dept-service'
+import deptService, {
+  type IDeptList,
+} from '@src/serviceAdmin/system/dept-service'
 import { Prisma } from '@prisma/client'
-import { isEmail, isPassword, formatResponse, isNumber } from '../utils'
+import { isEmail, isPassword, formatResponse, isNumber } from '@src/utils'
 import * as jwt from 'jsonwebtoken'
-import { ITree, deepListToTree } from '../utils/tool'
-import PageService from '../servicePublic/page-service'
-import { sJWT } from '../types'
-import adminUserService from '../serviceAdmin/adminUser-service'
+import { ITree, deepListToTree } from '@src/utils/tool'
+import PageService from '@src/servicePublic/page-service'
+import { sJWT } from '@src/types'
+import adminUserService from '@src/serviceAdmin/system/adminUser-service'
 import {
   type sDataPermission,
   hasDataPermission,
-} from '../middleware/permission'
-import redis from '../redis'
-import { ADMIN_USER_ID } from '../config'
+} from '@src/middleware/permission'
+import { ADMIN_USER_ID } from '@src/config'
 
 /**
  * 用户创建部门

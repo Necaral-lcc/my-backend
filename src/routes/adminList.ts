@@ -6,7 +6,7 @@ import {
   updateMenu,
   deleteMenu,
   getMenuTreeOptions,
-} from '../controllerAdmin/menu-controller'
+} from '../controllerAdmin/system/menu-controller'
 import {
   registerAdminUser,
   loginAdminUser,
@@ -14,7 +14,7 @@ import {
   getAdminUserForm,
   updateAdminUser,
   getAdminUserInfo,
-} from '../controllerAdmin/adminUser-controller'
+} from '../controllerAdmin/system/adminUser-controller'
 import {
   createRole,
   getRoles,
@@ -22,7 +22,7 @@ import {
   updateRole,
   deleteRole,
   getRoleOptions,
-} from '../controllerAdmin/role-controller'
+} from '../controllerAdmin/system/role-controller'
 import {
   createDept,
   updateDept,
@@ -30,7 +30,7 @@ import {
   getDepts,
   deleteDept,
   getDeptTree,
-} from '../controllerAdmin/dept-controller'
+} from '../controllerAdmin/system/dept-controller'
 import { authPermission, dataPermission } from '../middleware/permission'
 import type { IRoute } from './index'
 import * as jwt from 'koa-jwt'
@@ -44,7 +44,7 @@ import {
   deleteUser,
   getUserList,
   getUserDetail,
-} from '../controllerAdmin/user-controller'
+} from '../controllerAdmin/blog/user-controller'
 
 const list: IRoute[] = [
   {

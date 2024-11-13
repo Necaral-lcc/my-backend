@@ -1,16 +1,16 @@
-import { type sPrismaDept } from '../middleware/permission'
+import { type sPrismaDept } from '@src/middleware/permission'
 /**
  * Controller用于接受数据、返回数据给前端
  */
 import { Context } from 'koa'
-import userService from '../serviceAdmin/user-service'
+import userService from '@src/serviceAdmin/blog/user-service'
 import { Prisma } from '@prisma/client'
-import { isEmail, isPassword, formatResponse, isNumber } from '../utils'
-import { sJWT } from '../types'
-import { hashPassword } from '../utils/bcrypt'
-import { hasDataPermission } from '../middleware/permission'
-import { ADMIN_USER_ID } from '../config'
-import PageService from '../servicePublic/page-service'
+import { isEmail, isPassword, formatResponse, isNumber } from '@src/utils'
+import { sJWT } from '@src/types'
+import { hashPassword } from '@src/utils/bcrypt'
+import { hasDataPermission } from '@src/middleware/permission'
+import { ADMIN_USER_ID } from '@src/config'
+import PageService from '@src/servicePublic/page-service'
 
 /**
  * 创建用户
@@ -73,15 +73,22 @@ export const updateUser = async (ctx: Context) => {
   try {
     const adminUser = ctx.state.user as sJWT
     const depts = ctx.state.dataPermission.depts as sPrismaDept[]
-    const { id } = ctx.params
+    const id = ctx.params.id as string
     const { email, password, name, deptId } = ctx.request.body as {
       email?: string
       password?: string
       name?: string
       deptId?: number
     }
+    if (!id || !isNumber(id)) {
+      ctx.body = formatResponse({ id }, 'id必须为数字', 400)
+      return
+    }
     if (email) {
-      const repeatUser = await userService.findUnique(email)
+      const repeatUser = await userService.getUserEmailRepeat({
+        email,
+        id: Number(id),
+      })
       if (repeatUser) {
         ctx.body = formatResponse(null, '邮箱已存在', 400)
         return
@@ -94,7 +101,7 @@ export const updateUser = async (ctx: Context) => {
       }
     }
 
-    const userExist = await userService.getUserByIdUnderDepts(id, depts)
+    const userExist = await userService.getUserByIdUnderDepts(Number(id), depts)
     if (!userExist) {
       ctx.body = formatResponse(null, '用户不存在', 404)
       return
@@ -124,7 +131,7 @@ export const updateUser = async (ctx: Context) => {
         return
       }
     }
-    const updatedUser = await userService.update(id, {
+    const updatedUser = await userService.update(Number(id), {
       email,
       password: hashPasswordStr,
       name,
@@ -200,8 +207,12 @@ export const getUserList = async (ctx: Context) => {
     if (email) {
       where.AND = { ...where.AND, email: { contains: email } }
     }
+    console.log('deptIds', depts)
+
     if (adminUser.id !== ADMIN_USER_ID) {
       if (deptId) {
+        where.AND = { ...where.AND, deptId: deptId }
+      } else {
         where.OR = depts.map((dept) => ({ deptId: dept.id }))
       }
     }

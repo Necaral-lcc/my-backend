@@ -1,8 +1,8 @@
 import { Prisma, PrismaClient } from '@prisma/client'
 import { Context } from 'koa'
-import { PageParams } from './type'
+import { PageParams } from '../type'
 import { DefaultArgs } from '@prisma/client/runtime/library'
-import prisma from '../prisma'
+import prisma from '@src/prisma'
 
 /**
  * Service用来处理逻辑，返回结果给Controller

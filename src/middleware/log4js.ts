@@ -3,7 +3,7 @@ import * as log4js from 'log4js'
 const path = require('path')
 
 // 日志根目录
-let baseLogPath = path.resolve(__dirname, '../../logs')
+let baseLogPath = path.resolve(__dirname, '@src/logs')
 // 请求日志目录
 let reqPath = '/request'
 // 请求日志文件名

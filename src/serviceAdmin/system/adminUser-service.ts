@@ -1,10 +1,10 @@
 import { Prisma, PrismaClient } from '@prisma/client'
 import { Context } from 'koa'
-import { PageParams } from './type'
+import { PageParams } from '../type'
 import { DefaultArgs } from '@prisma/client/runtime/library'
-import { formatPageResponse } from '../utils'
-import prisma from '../prisma'
-import { type sPrismaDept } from '../middleware/permission'
+import { formatPageResponse } from '@src/utils'
+import prisma from '@src/prisma'
+import { type sPrismaDept } from '@src/middleware/permission'
 
 /**
  * Service用来处理逻辑，返回结果给Controller
