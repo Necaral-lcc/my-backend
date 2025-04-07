@@ -15,12 +15,12 @@ import adminUserService, {
   sAdminUserCreateParams,
 } from '@src/serviceAdmin/system/adminUser-service.ts'
 import { hashPassword, comparePassword } from '@src/utils/bcrypt.ts'
-import { sJWT } from '@src/types/index'
 import { sAdminUserInfo } from '../type'
 import menuService from '@src/serviceAdmin/system/menu-service.ts'
 import PageService from '@src/servicePublic/page-service.ts'
 import { listToTree } from '@src/utils/tool.ts'
 import { hasDataPermission, sPrismaDept } from '@src/middleware/permission.ts'
+import { sJWT } from '@src/types'
 
 /**
  * 管理员创建
